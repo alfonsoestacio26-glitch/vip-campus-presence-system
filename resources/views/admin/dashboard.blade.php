@@ -89,7 +89,7 @@
 
                 </div>
 
-                <a href="#" class="card-link">
+                <a href="{{ route('teachers.index') }}" class="card-link">
                     View all
                 </a>
 
@@ -128,7 +128,7 @@
 
                 </div>
 
-                <a href="#" class="card-link">
+                <a href="{{ route('parents.index') }}" class="card-link">
                     View all
                 </a>
 
