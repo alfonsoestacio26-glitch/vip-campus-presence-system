@@ -11,17 +11,11 @@ class ParentProfile extends Model
     protected $fillable = [
         'user_id',
         'first_name',
+        'middle_name',
         'last_name',
-        'phone_number',
-        'address'
+        'phone',
+        'address',
     ];
-
-
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
-
 
     public function students()
     {
@@ -31,5 +25,10 @@ class ParentProfile extends Model
             'parent_id',
             'student_id'
         );
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }

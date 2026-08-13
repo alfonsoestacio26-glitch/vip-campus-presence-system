@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Attendance extends Model
 {
+    protected $table = 'attendance';
+
     protected $fillable = [
         'student_id',
         'guard_id',
@@ -22,9 +24,9 @@ class Attendance extends Model
     }
 
 
-    public function guard()
+    public function securityGuard()
     {
-        return $this->belongsTo(Guard::class);
+        return $this->belongsTo(Guard::class, 'guard_id');
     }
 
 

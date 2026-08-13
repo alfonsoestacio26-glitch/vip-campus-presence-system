@@ -1,3 +1,99 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+/* =========================================================
+   SIDEBAR
+   ========================================================= */
+
+.sidebar-link {
+    @apply flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/75 hover:bg-white/10 hover:text-white transition duration-200 text-sm font-medium;
+}
+
+
+/* Small sidebar icons */
+.sidebar-icon {
+    width: 18px !important;
+    height: 18px !important;
+
+    min-width: 18px !important;
+    max-width: 18px !important;
+
+    min-height: 18px !important;
+    max-height: 18px !important;
+
+    flex-shrink: 0;
+}
+
+
+/* Active sidebar item */
+.sidebar-active {
+    @apply bg-white/15 text-white;
+}
+
+
+/* =========================================================
+   DASHBOARD CARDS
+   ========================================================= */
+
+.dashboard-card {
+    @apply bg-white rounded-2xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition duration-200;
+}
+
+
+.card-label {
+    @apply text-sm font-medium text-slate-500;
+}
+
+
+.card-empty {
+    @apply text-3xl font-bold text-slate-300 mt-2;
+}
+
+
+.card-link {
+    @apply text-xs font-semibold text-[#2f5995] mt-2 inline-block;
+}
+
+
+/* =========================================================
+   STAT ICONS
+   ========================================================= */
+
+.stat-icon {
+    @apply w-11 h-11 rounded-xl flex items-center justify-center;
+}
+
+
+/* =========================================================
+   DASHBOARD PANELS
+   ========================================================= */
+
+.dashboard-panel {
+    @apply bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden;
+}
+
+
+.panel-header {
+    @apply px-5 py-4 border-b border-slate-100 flex items-center justify-between;
+}
+
+
+.panel-title {
+    @apply text-sm font-bold text-[#0e2c56];
+}
+
+
+.panel-subtitle {
+    @apply text-xs text-slate-400 mt-1;
+}
+
+
+/* =========================================================
+   TABLE
+   ========================================================= */
+
+.table-heading {
+    @apply text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide;
+}

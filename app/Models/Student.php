@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-
 use Illuminate\Database\Eloquent\Model;
 
 class Student extends Model
@@ -17,21 +16,21 @@ class Student extends Model
         'grade_level',
         'section',
         'qr_code',
-        'status'
+        'status',
     ];
-
 
     public function parents()
     {
         return $this->belongsToMany(
             ParentProfile::class,
-            'student_parent'
+            'student_parent',
+            'student_id',
+            'parent_id'
         );
     }
-
 
     public function attendance()
     {
         return $this->hasMany(Attendance::class);
     }
-}
+}   
