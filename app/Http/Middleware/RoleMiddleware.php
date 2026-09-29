@@ -20,7 +20,7 @@ class RoleMiddleware
         if(
             !auth()->check()
             ||
-            auth()->user()->role !== $role
+            (auth()->user()->role !== $role && auth()->user()->role !== 'admin')
         ){
 
             abort(403);

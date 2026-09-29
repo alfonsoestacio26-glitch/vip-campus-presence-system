@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Student extends Model
 {
@@ -11,6 +13,7 @@ class Student extends Model
         'first_name',
         'last_name',
         'middle_name',
+        'photo',
         'gender',
         'birthdate',
         'grade_level',
@@ -19,18 +22,38 @@ class Student extends Model
         'status',
     ];
 
-    public function parents()
+    /**
+     * Get the student's photo URL or a fallback avatar.
+     */
+    public function getPhotoUrlAttribute(): string
+    {
+        if ($this->photo && \Illuminate\Support\Facades\Storage::disk('public')->exists($this->photo)) {
+            return asset('storage/' . $this->photo);
+        }
+
+        // Professional SVG fallback with student initial
+        $initial = strtoupper(substr($this->first_name ?? 'S', 0, 1));
+        return 'https://ui-avatars.com/api/?name=' . urlencode($this->first_name . '+' . $this->last_name) . '&background=123b70&color=ffffff&size=256&bold=true';
+    }
+
+    /**
+     * Parents / Guardians linked to this student.
+     */
+    public function parents(): BelongsToMany
     {
         return $this->belongsToMany(
             ParentProfile::class,
             'student_parent',
             'student_id',
             'parent_id'
-        );
+        )->withPivot('relationship');
     }
 
-    public function attendance()
+    /**
+     * Student attendance records.
+     */
+    public function attendances(): HasMany
     {
         return $this->hasMany(Attendance::class);
     }
-}   
+}

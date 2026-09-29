@@ -46,11 +46,37 @@
             <form
                 method="POST"
                 action="{{ route('students.update', $student) }}"
+                enctype="multipart/form-data"
                 class="p-6"
             >
 
                 @csrf
                 @method('PUT')
+
+                {{-- Current Photo & Upload --}}
+                <div class="mb-6 flex flex-col sm:flex-row sm:items-center gap-5 p-4 rounded-xl bg-slate-50 border border-slate-200">
+                    <img
+                        src="{{ $student->photo_url }}"
+                        alt="{{ $student->first_name }}"
+                        class="w-20 h-20 rounded-xl object-cover border border-slate-200 shadow-sm"
+                    >
+                    <div class="flex-1">
+                        <label for="photo" class="block text-sm font-semibold text-slate-700 mb-1">
+                            Change Student Photo
+                        </label>
+                        <input
+                            type="file"
+                            id="photo"
+                            name="photo"
+                            accept="image/*"
+                            class="w-full text-sm text-slate-600 file:mr-4 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-[#123b70] file:text-white hover:file:bg-[#0e2c56] file:cursor-pointer"
+                        >
+                        <p class="text-xs text-slate-400 mt-1">Leave empty to keep current photo. JPG, PNG, WebP up to 3MB.</p>
+                        @error('photo')
+                            <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
 
 
                 {{-- Student ID --}}

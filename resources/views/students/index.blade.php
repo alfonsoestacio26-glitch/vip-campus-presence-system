@@ -1,11 +1,34 @@
 <x-admin-layout>
 
-    <div class="max-w-7xl mx-auto">
+    <div class="max-w-7xl mx-auto" x-data="{ showImportModal: false }">
+
+        {{-- Alerts --}}
+        @if(session('success'))
+            <div class="mb-5 bg-emerald-50 border border-emerald-200 text-emerald-800 px-4 py-3 rounded-xl flex items-center justify-between shadow-sm">
+                <div class="flex items-center gap-3">
+                    <svg class="w-5 h-5 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <span class="text-sm font-medium">{{ session('success') }}</span>
+                </div>
+            </div>
+        @endif
+
+        @if(session('error'))
+            <div class="mb-5 bg-rose-50 border border-rose-200 text-rose-800 px-4 py-3 rounded-xl flex items-center justify-between shadow-sm">
+                <div class="flex items-center gap-3">
+                    <svg class="w-5 h-5 text-rose-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <span class="text-sm font-medium">{{ session('error') }}</span>
+                </div>
+            </div>
+        @endif
 
         {{-- Page Header --}}
         <div class="mb-6">
 
-            <div class="flex items-center justify-between">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
 
                 <div>
                     <h1 class="text-2xl font-bold text-[#0e2c56]">
@@ -13,37 +36,91 @@
                     </h1>
 
                     <p class="text-sm text-slate-400 mt-1">
-                        Manage student records and information
+                        Manage student records, batch enrollee cohorts, and print official ID badges
                     </p>
                 </div>
 
-                {{-- Add Student --}}
-                <a
-                    href="{{ route('students.create') }}"
-                    class="inline-flex items-center gap-2
-                           bg-[#123b70] hover:bg-[#0e2c56]
-                           text-white text-sm font-semibold
-                           px-5 py-2.5 rounded-xl
-                           transition"
-                >
+                {{-- Action Buttons --}}
+                <div class="flex items-center flex-wrap gap-2.5">
 
-                    <svg
-                        class="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
+                    {{-- Export CSV --}}
+                    <a
+                        href="{{ route('students.export') }}"
+                        class="inline-flex items-center gap-2
+                               bg-white hover:bg-slate-50
+                               border border-slate-200 text-slate-700
+                               text-sm font-semibold
+                               px-4 py-2.5 rounded-xl shadow-sm
+                               transition"
+                        title="Export students list to CSV"
                     >
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M12 5v14M5 12h14"
-                        />
-                    </svg>
+                        <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                        </svg>
+                        <span>Export CSV</span>
+                    </a>
 
-                    Add Student
+                    {{-- Import CSV Button --}}
+                    <button
+                        type="button"
+                        @click="showImportModal = true"
+                        class="inline-flex items-center gap-2
+                               bg-white hover:bg-slate-50
+                               border border-slate-200 text-slate-700
+                               text-sm font-semibold
+                               px-4 py-2.5 rounded-xl shadow-sm
+                               transition"
+                        title="Import students via CSV"
+                    >
+                        <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                        </svg>
+                        <span>Import CSV</span>
+                    </button>
 
-                </a>
+                    {{-- Batch Badges Print --}}
+                    <a
+                        href="{{ route('students.badges.batch') }}"
+                        class="inline-flex items-center gap-2
+                               bg-indigo-50 hover:bg-indigo-100
+                               border border-indigo-200 text-indigo-700
+                               text-sm font-semibold
+                               px-4 py-2.5 rounded-xl
+                               transition"
+                        title="Print batch official student ID cards"
+                    >
+                        <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2"/>
+                        </svg>
+                        <span>Print Badges</span>
+                    </a>
+
+                    {{-- Add Student --}}
+                    <a
+                        href="{{ route('students.create') }}"
+                        class="inline-flex items-center gap-2
+                               bg-[#123b70] hover:bg-[#0e2c56]
+                               text-white text-sm font-semibold
+                               px-5 py-2.5 rounded-xl shadow-sm
+                               transition"
+                    >
+                        <svg
+                            class="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M12 5v14M5 12h14"
+                            />
+                        </svg>
+                        <span>Add Student</span>
+                    </a>
+
+                </div>
 
             </div>
 
@@ -218,10 +295,42 @@
                                 {{-- Parent --}}
                                 <td class="px-6 py-4 text-sm text-slate-500">
 
-                                   
+                                    @if($student->parents->isNotEmpty())
+                                        <div class="space-y-1">
+
+                                            @foreach($student->parents as $parent)
+                                                <div class="flex items-center gap-2">
+
+                                                    {{-- User Icon --}}
+                                                    <svg
+                                                        class="w-4 h-4 text-slate-400"
+                                                        fill="none"
+                                                        stroke="currentColor"
+                                                        viewBox="0 0 24 24"
+                                                    >
+                                                        <path
+                                                            stroke-linecap="round"
+                                                            stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                                                        />
+                                                    </svg>
+
+                                                    <span class="text-sm text-slate-600">
+                                                        {{ $parent->first_name }}
+                                                        {{ $parent->last_name }}
+                                                    </span>
+
+                                                </div>
+                                            @endforeach
+
+                                        </div>
+
+                                    @else
+
                                         —
 
-                            
+                                    @endif
 
                                 </td>
 
@@ -261,8 +370,30 @@
                                 {{-- Actions --}}
                                 <td class="px-6 py-4">
 
-                                    <div class="flex items-center justify-end gap-4">
+                                    <div class="flex items-center justify-end gap-3">
 
+                                        {{-- PRINT ID BADGE --}}
+                                        <a
+                                            href="{{ route('students.badge', $student) }}"
+                                            class="text-indigo-600
+                                                   hover:text-indigo-800
+                                                   transition"
+                                            title="Print ID Badge with QR"
+                                        >
+                                            <svg
+                                                class="w-5 h-5"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <path
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    stroke-width="1.8"
+                                                    d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2"
+                                                />
+                                            </svg>
+                                        </a>
 
                                         {{-- VIEW --}}
                                         <a
@@ -487,6 +618,148 @@
 
         </div>
 
+    </div>
+
+    {{-- ======================================================== --}}
+    {{-- CSV BATCH IMPORT MODAL --}}
+    {{-- ======================================================== --}}
+    <div
+        x-show="showImportModal"
+        style="display: none;"
+        class="fixed inset-0 z-50 overflow-y-auto"
+        aria-labelledby="modal-title"
+        role="dialog"
+        aria-modal="true"
+    >
+        {{-- Backdrop --}}
+        <div
+            x-show="showImportModal"
+            x-transition:enter="ease-out duration-300"
+            x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100"
+            x-transition:leave="ease-in duration-200"
+            x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0"
+            class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity"
+            @click="showImportModal = false"
+        ></div>
+
+        <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+            <div
+                x-show="showImportModal"
+                x-transition:enter="ease-out duration-300"
+                x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                x-transition:leave="ease-in duration-200"
+                x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-lg border border-slate-200"
+            >
+                {{-- Modal Header --}}
+                <div class="bg-gradient-to-r from-[#0e2c56] to-[#123b70] px-6 py-5 text-white flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-bold" id="modal-title">
+                                Batch Import Students (CSV)
+                            </h3>
+                            <p class="text-xs text-blue-200 mt-0.5">
+                                Enroll multiple student cohorts at once
+                            </p>
+                        </div>
+                    </div>
+
+                    <button
+                        type="button"
+                        @click="showImportModal = false"
+                        class="text-white/70 hover:text-white transition rounded-lg p-1"
+                    >
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+
+                {{-- Form --}}
+                <form action="{{ route('students.import') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+
+                    <div class="p-6 space-y-4">
+                        {{-- Instructions Box --}}
+                        <div class="bg-blue-50/70 border border-blue-100 rounded-xl p-4 text-xs text-slate-600 space-y-2">
+                            <div class="font-bold text-[#0e2c56] flex items-center gap-1.5">
+                                <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                <span>CSV Format Guidelines:</span>
+                            </div>
+                            <p>
+                                Required columns: <code class="bg-white px-1.5 py-0.5 rounded border border-blue-200 font-mono text-[11px] text-blue-800">student_no</code>, <code class="bg-white px-1.5 py-0.5 rounded border border-blue-200 font-mono text-[11px] text-blue-800">first_name</code>, <code class="bg-white px-1.5 py-0.5 rounded border border-blue-200 font-mono text-[11px] text-blue-800">last_name</code>, <code class="bg-white px-1.5 py-0.5 rounded border border-blue-200 font-mono text-[11px] text-blue-800">grade_level</code>.
+                            </p>
+                            <p>
+                                Optional: <span class="font-medium text-slate-700">middle_name, gender, birthdate (YYYY-MM-DD), section, status</span>. Duplicate student IDs will be automatically skipped.
+                            </p>
+
+                            <div class="pt-1">
+                                <a
+                                    href="{{ route('students.import.template') }}"
+                                    class="inline-flex items-center gap-1.5 font-bold text-[#123b70] hover:text-[#0e2c56] hover:underline"
+                                >
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                                    </svg>
+                                    <span>Download Sample CSV Template</span>
+                                </a>
+                            </div>
+                        </div>
+
+                        {{-- File Input --}}
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                                Select CSV File
+                            </label>
+                            <div class="border-2 border-dashed border-slate-200 hover:border-[#123b70] rounded-xl p-5 text-center transition bg-slate-50/50">
+                                <svg class="w-8 h-8 text-slate-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                                <input
+                                    type="file"
+                                    name="csv_file"
+                                    accept=".csv,text/csv,text/plain"
+                                    required
+                                    class="text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-[#123b70] file:text-white hover:file:bg-[#0e2c56] cursor-pointer"
+                                >
+                                <p class="text-[11px] text-slate-400 mt-2">Only .csv files up to 5MB are accepted</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Modal Footer --}}
+                    <div class="bg-slate-50 px-6 py-4 flex items-center justify-end gap-3 border-t border-slate-100 rounded-b-2xl">
+                        <button
+                            type="button"
+                            @click="showImportModal = false"
+                            class="px-4 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-100 transition"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            class="px-5 py-2 rounded-xl bg-[#123b70] hover:bg-[#0e2c56] text-white text-xs font-semibold shadow-sm transition flex items-center gap-1.5"
+                        >
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            <span>Upload & Enroll</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 
 </x-admin-layout>

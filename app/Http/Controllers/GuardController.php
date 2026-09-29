@@ -87,7 +87,12 @@ class GuardController extends Controller
      */
     public function show(Guard $guard)
     {
-        $guard->load('user');
+        $guard->load([
+            'user',
+            'attendances' => function ($query) {
+                $query->with('student')->latest()->take(20);
+            },
+        ]);
         return view('guards.show', compact('guard'));
     }
 
@@ -137,8 +142,27 @@ class GuardController extends Controller
         });
 
         return redirect()
-            ->route('guards.index')
+            ->route('guards.show', $guard)
             ->with('success', 'Guard updated successfully.');
+    }
+
+    /**
+     * Upload or update guard photo directly.
+     */
+    public function updatePhoto(Request $request, Guard $guard)
+    {
+        $request->validate([
+            'photo' => 'required|image|mimes:jpeg,png,jpg,webp|max:3072',
+        ]);
+
+        if ($guard->photo && \Illuminate\Support\Facades\Storage::disk('public')->exists($guard->photo)) {
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($guard->photo);
+        }
+
+        $path = $request->file('photo')->store('guards/photos', 'public');
+        $guard->update(['photo' => $path]);
+
+        return back()->with('success', 'Guard photo updated successfully.');
     }
 
     /**

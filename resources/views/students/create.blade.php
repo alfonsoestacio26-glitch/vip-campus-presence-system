@@ -45,10 +45,29 @@
 
                 <form method="POST"
                       action="{{ route('students.store') }}"
+                      enctype="multipart/form-data"
                       class="p-6">
 
                     @csrf
 
+                    <!-- Student Photo -->
+                    <div class="mb-6">
+                        <label for="photo"
+                               class="block text-sm font-semibold text-slate-700 mb-2">
+                            Student Photo
+                        </label>
+                        <input
+                            type="file"
+                            id="photo"
+                            name="photo"
+                            accept="image/*"
+                            class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-[#123b70] file:text-white hover:file:bg-[#0e2c56] file:cursor-pointer"
+                        >
+                        <p class="text-xs text-slate-400 mt-1">Recommended: Square ID photo (JPG, PNG, WebP up to 3MB)</p>
+                        @error('photo')
+                            <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
 
                     <!-- Student Number -->
                     <div class="mb-6">

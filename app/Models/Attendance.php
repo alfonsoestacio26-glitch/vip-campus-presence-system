@@ -14,24 +14,22 @@ class Attendance extends Model
         'attendance_date',
         'time_in',
         'time_out',
-        'status'
+        'status',
     ];
 
+    protected $casts = [
+        'attendance_date' => 'date',
+        'time_in' => 'datetime',
+        'time_out' => 'datetime',
+    ];
 
     public function student()
     {
         return $this->belongsTo(Student::class);
     }
 
-
-    public function securityGuard()
+    public function guardProfile()
     {
         return $this->belongsTo(Guard::class, 'guard_id');
-    }
-
-
-    public function smsLogs()
-    {
-        return $this->hasMany(SmsLog::class);
     }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Student;
 use App\Models\User;
+use App\Models\ParentProfile;
 use Illuminate\Http\Request;
 
 class AdminDashboardController extends Controller
@@ -17,7 +18,7 @@ class AdminDashboardController extends Controller
         $teacherCount = User::where('role', 'teacher')->count();
 
         // Count parents
-        $parentCount = User::where('role', 'parent')->count();
+        $parentCount = ParentProfile::count();
 
         // Today's present
         $todayPresent = 0;

@@ -137,8 +137,27 @@ class TeacherController extends Controller
         });
 
         return redirect()
-            ->route('teachers.index')
+            ->route('teachers.show', $teacher)
             ->with('success', 'Teacher updated successfully.');
+    }
+
+    /**
+     * Upload or update teacher photo directly.
+     */
+    public function updatePhoto(Request $request, Teacher $teacher)
+    {
+        $request->validate([
+            'photo' => 'required|image|mimes:jpeg,png,jpg,webp|max:3072',
+        ]);
+
+        if ($teacher->photo && \Illuminate\Support\Facades\Storage::disk('public')->exists($teacher->photo)) {
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($teacher->photo);
+        }
+
+        $path = $request->file('photo')->store('teachers/photos', 'public');
+        $teacher->update(['photo' => $path]);
+
+        return back()->with('success', 'Teacher photo updated successfully.');
     }
 
     /**
