@@ -36,9 +36,9 @@
             <div class="flex items-center gap-3">
                 <a
                     href="{{ route('students.edit', $student) }}"
-                    class="inline-flex items-center gap-2 bg-[#123b70] hover:bg-[#0e2c56] text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-sm transition"
+                    class="inline-flex items-center gap-2 bg-[#155d36] hover:bg-[#0f4628] active:bg-[#09321c] text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-md hover:shadow-lg transition border border-[#155d36]"
                 >
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                     </svg>
                     <span>Edit Profile</span>
@@ -205,9 +205,9 @@
                 <button
                     type="button"
                     onclick="downloadStudentQR()"
-                    class="w-full mt-4 py-2.5 px-4 bg-[#123b70] hover:bg-[#0e2c56] text-white text-sm font-semibold rounded-xl shadow-sm transition flex items-center justify-center gap-2"
+                    class="w-full mt-4 py-2.5 px-4 bg-[#155d36] hover:bg-[#0f4628] active:bg-[#09321c] text-white text-sm font-bold rounded-xl shadow-md hover:shadow-lg transition flex items-center justify-center gap-2 border border-[#155d36]"
                 >
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
                     </svg>
                     <span>Download QR</span>
@@ -239,11 +239,11 @@
                     type="button"
                     @click="activeTab = 'information'"
                     class="px-5 py-3.5 text-sm font-bold transition-all relative"
-                    :class="activeTab === 'information' ? 'text-[#123b70]' : 'text-slate-500 hover:text-slate-700'"
+                    :class="activeTab === 'information' ? 'text-[#155d36]' : 'text-slate-500 hover:text-slate-700'"
                 >
                     <span>Information</span>
                     <div
-                        class="absolute bottom-0 left-0 right-0 h-0.5 bg-[#123b70] rounded-t-full transition-all"
+                        class="absolute bottom-0 left-0 right-0 h-0.5 bg-[#155d36] rounded-t-full transition-all"
                         x-show="activeTab === 'information'"
                     ></div>
                 </button>
@@ -252,14 +252,14 @@
                     type="button"
                     @click="activeTab = 'parents'"
                     class="px-5 py-3.5 text-sm font-bold transition-all relative"
-                    :class="activeTab === 'parents' ? 'text-[#123b70]' : 'text-slate-500 hover:text-slate-700'"
+                    :class="activeTab === 'parents' ? 'text-[#155d36]' : 'text-slate-500 hover:text-slate-700'"
                 >
                     <span>Parents/Guardians</span>
                     <span class="ml-1.5 px-2 py-0.5 rounded-full text-xs font-semibold bg-slate-200/80 text-slate-600">
                         {{ $student->parents->count() }}
                     </span>
                     <div
-                        class="absolute bottom-0 left-0 right-0 h-0.5 bg-[#123b70] rounded-t-full transition-all"
+                        class="absolute bottom-0 left-0 right-0 h-0.5 bg-[#155d36] rounded-t-full transition-all"
                         x-show="activeTab === 'parents'"
                     ></div>
                 </button>
@@ -268,11 +268,11 @@
                     type="button"
                     @click="activeTab = 'attendance'"
                     class="px-5 py-3.5 text-sm font-bold transition-all relative"
-                    :class="activeTab === 'attendance' ? 'text-[#123b70]' : 'text-slate-500 hover:text-slate-700'"
+                    :class="activeTab === 'attendance' ? 'text-[#155d36]' : 'text-slate-500 hover:text-slate-700'"
                 >
                     <span>Attendance Summary</span>
                     <div
-                        class="absolute bottom-0 left-0 right-0 h-0.5 bg-[#123b70] rounded-t-full transition-all"
+                        class="absolute bottom-0 left-0 right-0 h-0.5 bg-[#155d36] rounded-t-full transition-all"
                         x-show="activeTab === 'attendance'"
                     ></div>
                 </button>

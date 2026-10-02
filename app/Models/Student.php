@@ -37,6 +37,20 @@ class Student extends Model
     }
 
     /**
+     * Format student name as: Surname, First Name Middle Initial.
+     * Example: Dela Cruz, Juan P. (or Dela Cruz, Juan if no middle name)
+     */
+    public function getFormattedNameAttribute(): string
+    {
+        $mi = '';
+        if (!empty($this->middle_name)) {
+            $mi = ' ' . strtoupper(substr(trim($this->middle_name), 0, 1)) . '.';
+        }
+
+        return trim($this->last_name) . ', ' . trim($this->first_name) . $mi;
+    }
+
+    /**
      * Parents / Guardians linked to this student.
      */
     public function parents(): BelongsToMany

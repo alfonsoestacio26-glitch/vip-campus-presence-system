@@ -174,7 +174,7 @@
 
                 <button
                     type="submit"
-                    class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#123b70] hover:bg-[#0e2c56] text-white text-sm font-semibold transition"
+                    class="inline-flex items-center gap-2 bg-[#155d36] hover:bg-[#0f4628] active:bg-[#09321c] text-white font-bold text-sm rounded-xl px-5 py-2.5 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#155d36] focus:ring-offset-2 transition duration-200 border border-[#155d36]"
                 >
                     Save Changes
                 </button>

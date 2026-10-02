@@ -69,7 +69,7 @@
                             id="photo"
                             name="photo"
                             accept="image/*"
-                            class="w-full text-sm text-slate-600 file:mr-4 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-[#123b70] file:text-white hover:file:bg-[#0e2c56] file:cursor-pointer"
+                            class="w-full text-sm text-slate-600 file:mr-4 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-[#155d36] file:text-white hover:file:bg-[#0f4628] file:cursor-pointer"
                         >
                         <p class="text-xs text-slate-400 mt-1">Leave empty to keep current photo. JPG, PNG, WebP up to 3MB.</p>
                         @error('photo')
@@ -355,10 +355,7 @@
 
                     <button
                         type="submit"
-                        class="px-6 py-2.5 rounded-lg
-                               bg-[#0e2c56] text-white
-                               text-sm font-semibold
-                               hover:bg-[#163d70] transition"
+                        class="inline-flex items-center gap-2 bg-[#155d36] hover:bg-[#0f4628] active:bg-[#09321c] text-white font-bold text-sm rounded-xl px-5 py-2.5 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#155d36] focus:ring-offset-2 transition duration-200 border border-[#155d36]"
                     >
                         Save Changes
                     </button>

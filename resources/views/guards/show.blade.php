@@ -36,9 +36,9 @@
             <div class="flex items-center gap-3">
                 <a
                     href="{{ route('guards.edit', $guard) }}"
-                    class="inline-flex items-center gap-2 bg-[#123b70] hover:bg-[#0e2c56] text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-sm transition"
+                    class="inline-flex items-center gap-2 bg-[#155d36] hover:bg-[#0f4628] active:bg-[#09321c] text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-md hover:shadow-lg transition border border-[#155d36]"
                 >
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                     </svg>
                     <span>Edit Profile</span>
@@ -197,9 +197,9 @@
                 {{-- Account Details Button --}}
                 <a
                     href="{{ route('guards.edit', $guard) }}"
-                    class="w-full mt-4 py-2.5 px-4 bg-[#123b70] hover:bg-[#0e2c56] text-white text-sm font-semibold rounded-xl shadow-sm transition flex items-center justify-center gap-2"
+                    class="w-full mt-4 py-2.5 px-4 bg-[#155d36] hover:bg-[#0f4628] active:bg-[#09321c] text-white text-sm font-bold rounded-xl shadow-md hover:shadow-lg transition flex items-center justify-center gap-2 border border-[#155d36]"
                 >
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                     </svg>
                     <span>Edit Guard Profile</span>
@@ -220,11 +220,11 @@
                     type="button"
                     @click="activeTab = 'information'"
                     class="px-5 py-3.5 text-sm font-bold transition-all relative"
-                    :class="activeTab === 'information' ? 'text-[#123b70]' : 'text-slate-500 hover:text-slate-700'"
+                    :class="activeTab === 'information' ? 'text-[#155d36]' : 'text-slate-500 hover:text-slate-700'"
                 >
                     <span>Information</span>
                     <div
-                        class="absolute bottom-0 left-0 right-0 h-0.5 bg-[#123b70] rounded-t-full transition-all"
+                        class="absolute bottom-0 left-0 right-0 h-0.5 bg-[#155d36] rounded-t-full transition-all"
                         x-show="activeTab === 'information'"
                     ></div>
                 </button>
@@ -233,14 +233,14 @@
                     type="button"
                     @click="activeTab = 'scans'"
                     class="px-5 py-3.5 text-sm font-bold transition-all relative"
-                    :class="activeTab === 'scans' ? 'text-[#123b70]' : 'text-slate-500 hover:text-slate-700'"
+                    :class="activeTab === 'scans' ? 'text-[#155d36]' : 'text-slate-500 hover:text-slate-700'"
                 >
                     <span>Scans Processed</span>
                     <span class="ml-1.5 px-2 py-0.5 rounded-full text-xs font-semibold bg-slate-200/80 text-slate-600">
                         {{ $guard->attendances->count() }}
                     </span>
                     <div
-                        class="absolute bottom-0 left-0 right-0 h-0.5 bg-[#123b70] rounded-t-full transition-all"
+                        class="absolute bottom-0 left-0 right-0 h-0.5 bg-[#155d36] rounded-t-full transition-all"
                         x-show="activeTab === 'scans'"
                     ></div>
                 </button>
@@ -249,11 +249,11 @@
                     type="button"
                     @click="activeTab = 'duty'"
                     class="px-5 py-3.5 text-sm font-bold transition-all relative"
-                    :class="activeTab === 'duty' ? 'text-[#123b70]' : 'text-slate-500 hover:text-slate-700'"
+                    :class="activeTab === 'duty' ? 'text-[#155d36]' : 'text-slate-500 hover:text-slate-700'"
                 >
                     <span>Duty Overview</span>
                     <div
-                        class="absolute bottom-0 left-0 right-0 h-0.5 bg-[#123b70] rounded-t-full transition-all"
+                        class="absolute bottom-0 left-0 right-0 h-0.5 bg-[#155d36] rounded-t-full transition-all"
                         x-show="activeTab === 'duty'"
                     ></div>
                 </button>
@@ -353,12 +353,14 @@
 
                 @else
 
-                    <div class="py-12 text-center text-slate-400">
-                        <svg class="w-12 h-12 mx-auto text-slate-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                        </svg>
-                        <p class="text-sm font-semibold text-slate-600">No attendance scans verified yet</p>
-                        <p class="text-xs mt-1">Attendance logs registered through this guard's terminal will appear here.</p>
+                    <div class="py-12 px-4 text-center rounded-2xl bg-[#faf7f0]/60 border border-emerald-900/10">
+                        <div class="w-14 h-14 rounded-2xl bg-emerald-50 border border-emerald-200/60 flex items-center justify-center mx-auto mb-3 text-emerald-700 shadow-xs">
+                            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                            </svg>
+                        </div>
+                        <p class="text-base font-bold text-emerald-950">No gate scans logged yet for this personnel</p>
+                        <p class="text-xs text-slate-500 mt-1 max-w-sm mx-auto">Real-time attendance logs registered through this guard's scanning terminal will automatically populate here.</p>
                     </div>
 
                 @endif

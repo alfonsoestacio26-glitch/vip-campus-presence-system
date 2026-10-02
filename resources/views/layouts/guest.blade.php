@@ -14,13 +14,14 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="font-sans antialiased bg-[#e9edf3] min-h-screen">
+<body class="font-sans antialiased bg-[#faf7f0] min-h-screen">
 
     <div class="min-h-screen flex items-center justify-center p-4 sm:p-8">
 
         <!-- Main Login Container -->
         <div class="w-full max-w-6xl min-h-[650px] bg-white rounded-2xl overflow-hidden
-                    shadow-[0_25px_70px_-15px_rgba(14,44,86,0.25)]
+                    shadow-[0_25px_70px_-15px_rgba(21,93,54,0.18)]
+                    border-t-4 border-t-[#155d36] border border-stone-200/70
                     flex flex-col lg:flex-row">
 
             <!-- ========================================= -->
@@ -43,11 +44,11 @@
                     <!-- Heading -->
                     <div class="text-center mb-8">
 
-                        <h1 class="text-4xl font-extrabold text-[#0e2c56] tracking-tight">
+                        <h1 class="text-4xl font-extrabold text-[#155d36] tracking-tight">
                             Sign In
                         </h1>
 
-                        <p class="mt-2 text-sm text-slate-500">
+                        <p class="mt-2 text-sm text-stone-500">
                             Access your VIP Learning Center account
                         </p>
 
@@ -66,7 +67,7 @@
             <!-- ========================================= -->
 
             <div class="hidden lg:flex lg:w-1/2 relative overflow-hidden
-                        bg-gradient-to-br from-[#0e2c56] via-[#16477f] to-[#2f5995]
+                        bg-gradient-to-br from-[#155d36] via-[#0f4628] to-[#1b7444]
                         items-center justify-center text-white">
 
                 <!-- Decorative circles -->
@@ -120,7 +121,7 @@
                         Welcome Back!
                     </h2>
 
-                    <p class="mt-6 text-lg leading-8 text-white/85">
+                    <p class="mt-6 text-lg leading-8 text-white/90">
                         Welcome to the
                         <span class="font-bold text-white">
                             VIP Learning Center
@@ -128,7 +129,7 @@
                         Campus Management System.
                     </p>
 
-                    <p class="mt-3 text-sm leading-6 text-white/70">
+                    <p class="mt-3 text-sm leading-6 text-white/75">
                         Manage campus presence, attendance,
                         student information, parent communication,
                         and reports — all in one place.
@@ -139,20 +140,20 @@
                     <div class="mt-8 flex flex-wrap justify-center gap-3">
 
                         <span class="px-4 py-2 rounded-full
-                                     bg-white/10 border border-white/10
-                                     text-sm text-white/90">
+                                     bg-white/15 border border-white/20
+                                     text-sm text-white/95 font-medium">
                             Campus Presence
                         </span>
 
                         <span class="px-4 py-2 rounded-full
-                                     bg-white/10 border border-white/10
-                                     text-sm text-white/90">
+                                     bg-white/15 border border-white/20
+                                     text-sm text-white/95 font-medium">
                             Attendance
                         </span>
 
                         <span class="px-4 py-2 rounded-full
-                                     bg-white/10 border border-white/10
-                                     text-sm text-white/90">
+                                     bg-white/15 border border-white/20
+                                     text-sm text-white/95 font-medium">
                             Parent Portal
                         </span>
 
@@ -160,13 +161,13 @@
 
 
                     <!-- Bottom Branding -->
-                    <div class="mt-10 pt-6 border-t border-white/10">
+                    <div class="mt-10 pt-6 border-t border-white/15">
 
-                        <p class="text-xs uppercase tracking-[0.25em] text-white/50">
+                        <p class="text-xs uppercase tracking-[0.25em] text-white/60 font-semibold">
                             VIP LEARNING CENTER INC.
                         </p>
 
-                        <p class="mt-2 text-xs text-white/40">
+                        <p class="mt-2 text-xs text-white/50">
                             Automated Campus-Presence Verification System
                         </p>
 

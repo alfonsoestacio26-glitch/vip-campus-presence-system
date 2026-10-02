@@ -12,8 +12,10 @@ class GuardDashboardController extends Controller
      */
     public function index()
     {
+        $today = \Carbon\Carbon::now('Asia/Manila')->toDateString();
+
         $recentScans = Attendance::with('student')
-            ->whereDate('attendance_date', today())
+            ->whereDate('attendance_date', $today)
             ->orderByDesc('updated_at')
             ->take(5)
             ->get();
@@ -27,7 +29,7 @@ class GuardDashboardController extends Controller
     public function history()
     {
         // Today's date
-        $today = today();
+        $today = \Carbon\Carbon::now('Asia/Manila')->toDateString();
 
         // Total registered students
         $totalStudents = Student::count();

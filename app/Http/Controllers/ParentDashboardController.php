@@ -19,36 +19,42 @@ class ParentDashboardController extends Controller
     {
         $user = Auth::user();
 
-        // 1. Resolve ParentProfile
+        // 1. Resolve ParentProfile for authenticated user
         $parent = null;
         if ($user) {
-            $parent = $user->parentProfile;
-            if (!$parent) {
-                $parent = ParentProfile::where('user_id', $user->id)->first();
-            }
+            $parent = $user->parentProfile ?? ParentProfile::where('user_id', $user->id)->first();
         }
 
-        // Demo / fallback profile if accessing as admin or newly registered without linkage
-        if (!$parent) {
+        // Fallback for admin preview only
+        if (!$parent && $user && $user->role === 'admin') {
             $parent = ParentProfile::has('students')->first() ?? ParentProfile::first();
         }
 
-        // 2. Load linked children
+        // 2. Load linked children sorted alphabetically by surname
         $children = collect();
         if ($parent) {
-            $children = $parent->students()->with([
-                'attendances' => function ($q) {
-                    $q->orderByDesc('attendance_date')->orderByDesc('time_in');
-                }
-            ])->get();
+            $children = $parent->students()
+                ->orderBy('last_name')
+                ->orderBy('first_name')
+                ->with([
+                    'attendances' => function ($q) {
+                        $q->orderByDesc('attendance_date')->orderByDesc('time_in');
+                    }
+                ])
+                ->get();
         }
 
-        // 3. Determine selected child
+        // 3. Determine selected child & enforce backend security check
         $selectedChildId = $request->input('child_id');
         $selectedStudent = null;
 
         if ($selectedChildId) {
             $selectedStudent = $children->firstWhere('id', $selectedChildId);
+            
+            // SECURITY: If student ID was passed but does NOT belong to this parent -> 403 Forbidden
+            if (!$selectedStudent && $user->role === 'parent') {
+                abort(403, 'Forbidden. The requested student is not linked to your account.');
+            }
         }
 
         if (!$selectedStudent && $children->isNotEmpty()) {
@@ -79,7 +85,7 @@ class ParentDashboardController extends Controller
             // Today's attendance
             $todayAttendance = Attendance::with('guardProfile')
                 ->where('student_id', $selectedStudent->id)
-                ->where('attendance_date', $today)
+                ->whereDate('attendance_date', $today)
                 ->first();
 
             if ($todayAttendance) {
@@ -158,5 +164,23 @@ class ParentDashboardController extends Controller
             'announcements',
             'today'
         ));
+    }
+
+    /**
+     * Display a specific linked child's dashboard view.
+     */
+    public function showChild(Request $request, Student $student)
+    {
+        $user = Auth::user();
+
+        if ($user->role === 'parent') {
+            $parent = $user->parentProfile;
+            if (!$parent || !$parent->students()->where('students.id', $student->id)->exists()) {
+                abort(403, 'Forbidden. This student is not linked to your parent account.');
+            }
+        }
+
+        $request->merge(['child_id' => $student->id]);
+        return $this->index($request);
     }
 }

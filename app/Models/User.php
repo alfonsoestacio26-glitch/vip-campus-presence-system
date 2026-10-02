@@ -13,7 +13,9 @@ use Illuminate\Notifications\Notifiable;
     'name',
     'email',
     'password',
-    'role'
+    'role',
+    'google_id',
+    'google_avatar'
 ])]
 
 #[Hidden([
@@ -29,6 +31,14 @@ class User extends Authenticatable
     public function teacher()
     {
         return $this->hasOne(Teacher::class);
+    }
+
+    /**
+     * Get assigned sections array for teacher user.
+     */
+    public function getAssignedSectionsAttribute(): array
+    {
+        return $this->teacher ? $this->teacher->assigned_sections : [];
     }
 
 

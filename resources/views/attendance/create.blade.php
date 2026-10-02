@@ -267,15 +267,15 @@
                            focus:border-[#123b70]"
                 >
 
-                    <option value="present">
+                    <option value="Present" @selected(old('status') == 'Present' || old('status') == 'present' || !old('status'))>
                         Present
                     </option>
 
-                    <option value="late">
+                    <option value="Late" @selected(old('status') == 'Late' || old('status') == 'late')>
                         Late
                     </option>
 
-                    <option value="absent">
+                    <option value="Absent" @selected(old('status') == 'Absent' || old('status') == 'absent')>
                         Absent
                     </option>
 
@@ -305,13 +305,7 @@
 
                 <button
                     type="submit"
-                    class="px-5 py-2.5
-                           rounded-xl
-                           text-sm
-                           font-semibold
-                           text-white
-                           bg-[#123b70]
-                           hover:bg-[#0e2c56]"
+                    class="inline-flex items-center gap-2 bg-[#155d36] hover:bg-[#0f4628] active:bg-[#09321c] text-white font-bold text-sm rounded-xl px-5 py-2.5 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#155d36] focus:ring-offset-2 transition duration-200 border border-[#155d36]"
                 >
                     Save Attendance
                 </button>

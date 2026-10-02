@@ -102,9 +102,21 @@
                             Status
                         </p>
 
-                        <p class="text-sm font-semibold text-slate-700 mt-1">
-                            {{ ucfirst($attendance->status) }}
-                        </p>
+                        <div class="mt-1">
+                            @if(strtolower($attendance->status) === 'present')
+                                <span class="inline-flex px-2.5 py-1 rounded-lg bg-green-50 text-green-700 text-xs font-semibold">
+                                    Present
+                                </span>
+                            @elseif(strtolower($attendance->status) === 'late')
+                                <span class="inline-flex px-2.5 py-1 rounded-lg bg-amber-50 text-amber-700 text-xs font-semibold">
+                                    Late
+                                </span>
+                            @else
+                                <span class="inline-flex px-2.5 py-1 rounded-lg bg-red-50 text-red-700 text-xs font-semibold">
+                                    Absent
+                                </span>
+                            @endif
+                        </div>
                     </div>
 
 
@@ -147,8 +159,8 @@
 
                         <p class="text-sm font-semibold text-slate-700 mt-1">
 
-                            {{ $attendance->guard
-                                ? $attendance->guard->first_name . ' ' . $attendance->guard->last_name
+                            {{ $attendance->guardProfile
+                                ? $attendance->guardProfile->first_name . ' ' . $attendance->guardProfile->last_name
                                 : '—'
                             }}
 

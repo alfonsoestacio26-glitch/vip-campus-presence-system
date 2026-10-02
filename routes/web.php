@@ -81,6 +81,13 @@ Route::middleware(['auth'])->group(function () {
         ->middleware('role:teacher')
         ->name('teacher.dashboard');
 
+    Route::get('/teacher/dashboard/live-data', [
+        TeacherDashboardController::class,
+        'liveData'
+    ])
+        ->middleware('role:teacher')
+        ->name('teacher.dashboard.live');
+
     Route::post('/teacher/attendance/status', [
         TeacherDashboardController::class,
         'updateStatus'
@@ -175,6 +182,13 @@ Route::middleware(['auth'])->group(function () {
     ])
         ->middleware('role:parent')
         ->name('parent.dashboard');
+
+    Route::get('/parent/students/{student}', [
+        ParentDashboardController::class,
+        'showChild'
+    ])
+        ->middleware('role:parent')
+        ->name('parent.students.show');
 
 
     /*

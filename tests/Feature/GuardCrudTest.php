@@ -92,7 +92,7 @@ class GuardCrudTest extends TestCase
 
         $response
             ->assertSessionHasNoErrors()
-            ->assertRedirect(route('guards.index'));
+            ->assertRedirect(route('guards.show', $guard));
 
         $this->assertDatabaseHas('guards', [
             'id' => $guard->id,

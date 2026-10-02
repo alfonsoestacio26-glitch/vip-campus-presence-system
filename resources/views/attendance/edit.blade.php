@@ -156,8 +156,8 @@
                     <input
                         type="time"
                         name="time_in"
-                        value="{{ old('time_in', $attendance->time_in) }}"
-                        class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm"
+                        value="{{ old('time_in', $attendance->time_in ? \Carbon\Carbon::parse($attendance->time_in)->format('H:i') : '') }}"
+                        class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#123b70]/20 focus:border-[#123b70]"
                     >
 
                 </div>
@@ -172,8 +172,8 @@
                     <input
                         type="time"
                         name="time_out"
-                        value="{{ old('time_out', $attendance->time_out) }}"
-                        class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm"
+                        value="{{ old('time_out', $attendance->time_out ? \Carbon\Carbon::parse($attendance->time_out)->format('H:i') : '') }}"
+                        class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#123b70]/20 focus:border-[#123b70]"
                     >
 
                 </div>
@@ -191,26 +191,26 @@
                 <select
                     name="status"
                     required
-                    class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm"
+                    class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#123b70]/20 focus:border-[#123b70]"
                 >
 
                     <option
-                        value="present"
-                        @selected($attendance->status === 'present')
+                        value="Present"
+                        @selected(strtolower(old('status', $attendance->status)) === 'present')
                     >
                         Present
                     </option>
 
                     <option
-                        value="late"
-                        @selected($attendance->status === 'late')
+                        value="Late"
+                        @selected(strtolower(old('status', $attendance->status)) === 'late')
                     >
                         Late
                     </option>
 
                     <option
-                        value="absent"
-                        @selected($attendance->status === 'absent')
+                        value="Absent"
+                        @selected(strtolower(old('status', $attendance->status)) === 'absent')
                     >
                         Absent
                     </option>
@@ -232,7 +232,7 @@
 
                 <button
                     type="submit"
-                    class="px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-[#123b70] hover:bg-[#0e2c56]"
+                    class="inline-flex items-center gap-2 bg-[#155d36] hover:bg-[#0f4628] active:bg-[#09321c] text-white font-bold text-sm rounded-xl px-5 py-2.5 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#155d36] focus:ring-offset-2 transition duration-200 border border-[#155d36]"
                 >
                     Update Attendance
                 </button>

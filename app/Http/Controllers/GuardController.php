@@ -15,23 +15,24 @@ class GuardController extends Controller
      */
     public function index(Request $request)
     {
-        $search = $request->input('search');
+        $search = trim($request->input('search', ''));
 
-        $guards = Guard::query()
-            ->with('user')
-            ->when($search, function ($query, $search) {
-                $query->where(function ($q) use ($search) {
-                    $q->where('first_name', 'like', "%{$search}%")
-                      ->orWhere('last_name', 'like', "%{$search}%")
-                      ->orWhere('employee_no', 'like', "%{$search}%")
-                      ->orWhere('contact_number', 'like', "%{$search}%")
-                      ->orWhereHas('user', function ($uQ) use ($search) {
-                          $uQ->where('email', 'like', "%{$search}%");
-                      });
-                });
-            })
-            ->latest()
-            ->get();
+        $query = Guard::query()->with(['user', 'attendances']);
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('first_name', 'like', "%{$search}%")
+                  ->orWhere('last_name', 'like', "%{$search}%")
+                  ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%{$search}%"])
+                  ->orWhere('employee_no', 'like', "%{$search}%")
+                  ->orWhere('contact_number', 'like', "%{$search}%")
+                  ->orWhereHas('user', function ($uQ) use ($search) {
+                      $uQ->where('email', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        $guards = $query->latest()->paginate(15)->withQueryString();
 
         return view('guards.index', compact('guards', 'search'));
     }

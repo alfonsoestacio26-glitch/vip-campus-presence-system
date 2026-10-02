@@ -23,7 +23,7 @@
             <div class="flex items-center gap-3">
                 <a
                     href="{{ route('guard.dashboard') }}"
-                    class="inline-flex items-center gap-2.5 bg-[#123b70] hover:bg-[#0e2c56] text-white font-semibold text-sm px-5 py-2.5 rounded-xl shadow-sm hover:shadow transition duration-200"
+                    class="inline-flex items-center gap-2.5 bg-[#155d36] hover:bg-[#0f4628] text-white font-semibold text-sm px-5 py-2.5 rounded-xl shadow-sm hover:shadow transition duration-200"
                 >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/>
@@ -169,48 +169,6 @@
 
         </div>
 
-
-        {{-- QR Scanner Hero Card --}}
-        <div class="bg-gradient-to-r from-[#123b70] to-[#0e2c56] rounded-2xl p-6 sm:p-8 text-white shadow-sm">
-
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
-
-                <div class="space-y-2 max-w-2xl">
-
-                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-white/90 text-xs font-medium backdrop-blur-sm">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                        </svg>
-                        Instant Automated Verification
-                    </div>
-
-                    <h2 class="text-xl sm:text-2xl font-bold tracking-tight">
-                        Automated QR Attendance Scanner
-                    </h2>
-
-                    <p class="text-sm text-white/80 leading-relaxed">
-                        Point the camera at any student ID QR code. The system automatically detects whether to record a <span class="font-semibold text-white">Time In</span> (first scan of the day) or <span class="font-semibold text-white">Time Out</span> (departure), linking the scan directly to your guard profile.
-                    </p>
-
-                </div>
-
-                <div class="flex-shrink-0">
-
-                    <a
-                        href="{{ route('guard.dashboard') }}"
-                        class="inline-flex items-center justify-center gap-3 bg-white text-[#0e2c56] hover:bg-slate-100 font-bold px-7 py-3.5 rounded-xl shadow-md transition duration-200 text-sm"
-                    >
-                        <svg class="w-5 h-5 text-[#123b70]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/>
-                        </svg>
-                        <span>Open QR Scanner</span>
-                    </a>
-
-                </div>
-
-            </div>
-
-        </div>
 
 
         {{-- Lower Panels --}}

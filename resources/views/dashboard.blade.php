@@ -1,22 +1,22 @@
 <x-app-layout>
 
-    <div class="min-h-screen bg-[#f5f7fb]">
+    <div class="min-h-screen bg-[#faf7f0]">
 
         <!-- TOP HEADER -->
-        <header class="h-20 bg-white border-b border-slate-200 flex items-center justify-between px-6 lg:px-8">
+        <header class="h-20 bg-white border-b border-stone-200 border-t-4 border-t-[#155d36] flex items-center justify-between px-6 lg:px-8">
 
             <div class="flex items-center gap-4">
 
-                <button class="lg:hidden p-2 rounded-lg hover:bg-slate-100">
+                <button class="lg:hidden p-2 rounded-lg hover:bg-stone-100">
                     ☰
                 </button>
 
                 <div>
-                    <h1 class="text-xl font-bold text-[#0e2c56]">
+                    <h1 class="text-xl font-bold text-[#155d36]">
                         Admin Dashboard
                     </h1>
 
-                    <p class="text-xs text-slate-400">
+                    <p class="text-xs text-stone-400">
                         Campus Management Overview
                     </p>
                 </div>
@@ -26,17 +26,17 @@
             <div class="flex items-center gap-4">
 
                 <div class="text-right">
-                    <p class="text-sm font-semibold text-[#0e2c56]">
+                    <p class="text-sm font-semibold text-[#155d36]">
                         Admin
                     </p>
 
-                    <p class="text-xs text-slate-400">
+                    <p class="text-xs text-stone-400">
                         Administrator
                     </p>
                 </div>
 
-                <div class="w-10 h-10 rounded-full bg-[#0e2c56]
-                            flex items-center justify-center text-white">
+                <div class="w-10 h-10 rounded-full bg-[#155d36]
+                            flex items-center justify-center text-white font-bold text-sm shadow-xs">
                     A
                 </div>
 
@@ -51,7 +51,7 @@
 
             <!-- SIDEBAR -->
             <aside class="hidden lg:flex w-64 min-h-[calc(100vh-80px)]
-                           bg-gradient-to-b from-[#0e2c56] to-[#123b70]
+                           bg-gradient-to-b from-[#155d36] to-[#0f4628]
                            text-white flex-col">
 
                 <!-- LOGO -->
@@ -60,7 +60,7 @@
                     <div class="flex items-center gap-3">
 
                         <div class="w-11 h-11 rounded-xl bg-white
-                                    flex items-center justify-center">
+                                    flex items-center justify-center p-1 shadow-xs">
 
                             <img
                                 src="{{ asset('images/logo.png') }}"
@@ -88,60 +88,93 @@
 
 
                 <!-- MENU -->
-                <nav class="flex-1 px-3 py-5 space-y-1">
+                <nav class="flex-1 px-3 py-5 space-y-4">
 
-                    <a href="{{ route('dashboard') }}"
-                       class="sidebar-link bg-white/15 text-white font-semibold">
+                    <!-- MAIN -->
+                    <div class="space-y-1">
+                        <div class="px-3 text-[10px] font-semibold uppercase tracking-wider text-white/40 select-none">
+                            MAIN
+                        </div>
 
-                        🏠
-                        Dashboard
+                        <a href="{{ route('dashboard') }}"
+                           class="sidebar-link bg-white/20 text-white font-semibold shadow-xs">
+                            🏠
+                            Dashboard
+                        </a>
+                    </div>
 
-                    </a>
+                    <!-- MANAGEMENT -->
+                    <div class="space-y-1">
+                        <div class="px-3 text-[10px] font-semibold uppercase tracking-wider text-white/40 select-none">
+                            MANAGEMENT
+                        </div>
 
-                    <a href="#" class="sidebar-link">
-                        👨‍🎓
-                        Students
-                    </a>
+                        <a href="#" class="sidebar-link">
+                            👨‍🎓
+                            Students
+                        </a>
 
-                    <a href="#" class="sidebar-link">
-                        👨‍👩‍👧
-                        Parents
-                    </a>
+                        <a href="#" class="sidebar-link">
+                            👨‍👩‍👧
+                            Parents
+                        </a>
 
-                    <a href="#" class="sidebar-link">
-                        👨‍🏫
-                        Teachers
-                    </a>
+                        <a href="#" class="sidebar-link">
+                            👨‍🏫
+                            Teachers
+                        </a>
 
-                    <a href="#" class="sidebar-link">
-                        🛡️
-                        Guards
-                    </a>
+                        <a href="#" class="sidebar-link">
+                            🛡️
+                            Guards
+                        </a>
+                    </div>
 
-                    <a href="#" class="sidebar-link">
-                        📅
-                        Attendance
-                    </a>
+                    <!-- ATTENDANCE -->
+                    <div class="space-y-1">
+                        <div class="px-3 text-[10px] font-semibold uppercase tracking-wider text-white/40 select-none">
+                            ATTENDANCE
+                        </div>
 
-                    <a href="#" class="sidebar-link">
-                        📊
-                        Reports
-                    </a>
+                        <a href="#" class="sidebar-link">
+                            📅
+                            Attendance
+                        </a>
 
-                    <a href="#" class="sidebar-link">
-                        📢
-                        Announcements
-                    </a>
+                        <a href="#" class="sidebar-link">
+                            📊
+                            Reports
+                        </a>
+                    </div>
 
-                    <a href="#" class="sidebar-link">
-                        💬
-                        SMS Logs
-                    </a>
+                    <!-- COMMUNICATION -->
+                    <div class="space-y-1">
+                        <div class="px-3 text-[10px] font-semibold uppercase tracking-wider text-white/40 select-none">
+                            COMMUNICATION
+                        </div>
 
-                    <a href="#" class="sidebar-link">
-                        ⚙️
-                        Settings
-                    </a>
+                        <a href="#" class="sidebar-link">
+                            📢
+                            Announcements
+                        </a>
+
+                        <a href="#" class="sidebar-link">
+                            💬
+                            SMS Logs
+                        </a>
+                    </div>
+
+                    <!-- SYSTEM -->
+                    <div class="space-y-1">
+                        <div class="px-3 text-[10px] font-semibold uppercase tracking-wider text-white/40 select-none">
+                            SYSTEM
+                        </div>
+
+                        <a href="#" class="sidebar-link">
+                            ⚙️
+                            Settings
+                        </a>
+                    </div>
 
                 </nav>
 
@@ -174,11 +207,11 @@
 
                 <div class="mb-6">
 
-                    <h2 class="text-2xl font-bold text-[#0e2c56]">
+                    <h2 class="text-2xl font-bold text-[#155d36]">
                         Dashboard
                     </h2>
 
-                    <p class="text-sm text-slate-500 mt-1">
+                    <p class="text-sm text-stone-500 mt-1">
                         Overview of your campus management system
                     </p>
 
@@ -196,11 +229,11 @@
                             Students
                         </p>
 
-                        <p class="card-empty">
+                        <p class="card-empty text-[#155d36]">
                             —
                         </p>
 
-                        <span class="card-link">
+                        <span class="card-link text-[#155d36]">
                             View all
                         </span>
 
@@ -214,11 +247,11 @@
                             Teachers
                         </p>
 
-                        <p class="card-empty">
+                        <p class="card-empty text-[#155d36]">
                             —
                         </p>
 
-                        <span class="card-link">
+                        <span class="card-link text-[#155d36]">
                             View all
                         </span>
 
@@ -232,11 +265,11 @@
                             Parents
                         </p>
 
-                        <p class="card-empty">
+                        <p class="card-empty text-[#155d36]">
                             —
                         </p>
 
-                        <span class="card-link">
+                        <span class="card-link text-[#155d36]">
                             View all
                         </span>
 
@@ -250,11 +283,11 @@
                             Today's Present
                         </p>
 
-                        <p class="card-empty">
+                        <p class="card-empty text-[#155d36]">
                             —
                         </p>
 
-                        <span class="card-link">
+                        <span class="card-link text-[#155d36]">
                             View attendance
                         </span>
 
@@ -274,7 +307,7 @@
 
                             <div>
 
-                                <h3 class="panel-title">
+                                <h3 class="panel-title text-[#155d36]">
                                     Attendance Overview
                                 </h3>
 
@@ -290,17 +323,17 @@
                                     items-center justify-center">
 
                             <div class="w-44 h-44 rounded-full
-                                        border-[24px] border-slate-100
+                                        border-[24px] border-stone-100
                                         flex items-center justify-center">
 
                                 <div class="text-center">
 
                                     <p class="text-3xl font-bold
-                                              text-slate-300">
+                                              text-stone-300">
                                         —
                                     </p>
 
-                                    <p class="text-xs text-slate-400">
+                                    <p class="text-xs text-stone-400">
                                         No data yet
                                     </p>
 
@@ -308,7 +341,7 @@
 
                             </div>
 
-                            <p class="mt-5 text-sm text-slate-400">
+                            <p class="mt-5 text-sm text-stone-400">
                                 Attendance data will appear here.
                             </p>
 
@@ -324,7 +357,7 @@
 
                             <div>
 
-                                <h3 class="panel-title">
+                                <h3 class="panel-title text-[#155d36]">
                                     Recent Scans
                                 </h3>
 
@@ -335,7 +368,7 @@
                             </div>
 
                             <span class="text-sm font-semibold
-                                         text-[#2f5995]">
+                                         text-[#155d36]">
                                 View all
                             </span>
 
@@ -345,7 +378,7 @@
                                     items-center justify-center">
 
                             <div class="w-12 h-12 rounded-full
-                                        bg-slate-50 flex items-center
+                                        bg-stone-50 flex items-center
                                         justify-center">
 
                                 📋
@@ -353,13 +386,13 @@
                             </div>
 
                             <p class="mt-3 text-sm font-medium
-                                      text-slate-400">
+                                      text-stone-400">
 
                                 No attendance records yet
 
                             </p>
 
-                            <p class="text-xs text-slate-300 mt-1">
+                            <p class="text-xs text-stone-300 mt-1">
 
                                 Scanned students will appear here.
 

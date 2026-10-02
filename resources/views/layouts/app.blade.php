@@ -2,11 +2,8 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
-
     <meta charset="utf-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>
@@ -14,13 +11,23 @@
     </title>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-
 </head>
 
+<body class="bg-[#faf7f0] text-slate-800 antialiased font-sans">
 
-<body class="font-sans antialiased">
+    @php
+        $role = auth()->user()->role ?? 'guard';
+    @endphp
 
-    {{ $slot }}
+    @if($role === 'admin')
+        <x-admin-layout>
+            {{ $slot }}
+        </x-admin-layout>
+    @else
+        <x-guard-layout>
+            {{ $slot }}
+        </x-guard-layout>
+    @endif
 
 </body>
 

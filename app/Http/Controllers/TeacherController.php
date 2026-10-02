@@ -15,25 +15,46 @@ class TeacherController extends Controller
      */
     public function index(Request $request)
     {
-        $search = $request->input('search');
+        $search = trim($request->input('search', ''));
+        $section = $request->input('section');
+        $gradeLevel = $request->input('grade_level');
 
-        $teachers = Teacher::query()
-            ->with('user')
-            ->when($search, function ($query, $search) {
-                $query->where(function ($q) use ($search) {
-                    $q->where('first_name', 'like', "%{$search}%")
-                      ->orWhere('last_name', 'like', "%{$search}%")
-                      ->orWhere('employee_no', 'like', "%{$search}%")
-                      ->orWhere('contact_number', 'like', "%{$search}%")
-                      ->orWhereHas('user', function ($uQ) use ($search) {
-                          $uQ->where('email', 'like', "%{$search}%");
-                      });
-                });
-            })
-            ->latest()
-            ->get();
+        $sections = Teacher::distinct()->whereNotNull('section')->where('section', '!=', '')->pluck('section')->sort()->values();
+        $gradeLevels = Teacher::distinct()->whereNotNull('grade_level')->where('grade_level', '!=', '')->pluck('grade_level')->sort()->values();
 
-        return view('teachers.index', compact('teachers', 'search'));
+        $query = Teacher::query()->with('user');
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('first_name', 'like', "%{$search}%")
+                  ->orWhere('last_name', 'like', "%{$search}%")
+                  ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%{$search}%"])
+                  ->orWhere('employee_no', 'like', "%{$search}%")
+                  ->orWhere('contact_number', 'like', "%{$search}%")
+                  ->orWhereHas('user', function ($uQ) use ($search) {
+                      $uQ->where('email', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        if ($section) {
+            $query->where('section', $section);
+        }
+
+        if ($gradeLevel) {
+            $query->where('grade_level', $gradeLevel);
+        }
+
+        $teachers = $query->latest()->paginate(15)->withQueryString();
+
+        return view('teachers.index', compact(
+            'teachers',
+            'search',
+            'section',
+            'gradeLevel',
+            'sections',
+            'gradeLevels'
+        ));
     }
 
     /**
@@ -54,6 +75,8 @@ class TeacherController extends Controller
             'first_name' => 'required|string|max:100',
             'last_name' => 'required|string|max:100',
             'contact_number' => 'nullable|string|max:30',
+            'section' => 'nullable|string|max:100',
+            'grade_level' => 'nullable|string|max:50',
             'email' => 'required|email|max:255|unique:users,email',
             'password' => 'nullable|string|min:8',
         ]);
@@ -74,6 +97,8 @@ class TeacherController extends Controller
                 'first_name' => $validated['first_name'],
                 'last_name' => $validated['last_name'],
                 'contact_number' => $validated['contact_number'] ?? null,
+                'section' => $validated['section'] ?? null,
+                'grade_level' => $validated['grade_level'] ?? null,
             ]);
         });
 
@@ -110,6 +135,8 @@ class TeacherController extends Controller
             'first_name' => 'required|string|max:100',
             'last_name' => 'required|string|max:100',
             'contact_number' => 'nullable|string|max:30',
+            'section' => 'nullable|string|max:100',
+            'grade_level' => 'nullable|string|max:50',
             'email' => 'required|email|max:255|unique:users,email,' . $teacher->user_id,
             'password' => 'nullable|string|min:8',
         ]);
@@ -133,6 +160,8 @@ class TeacherController extends Controller
                 'first_name' => $validated['first_name'],
                 'last_name' => $validated['last_name'],
                 'contact_number' => $validated['contact_number'] ?? null,
+                'section' => $validated['section'] ?? null,
+                'grade_level' => $validated['grade_level'] ?? null,
             ]);
         });
 

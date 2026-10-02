@@ -322,7 +322,217 @@
                 </div>
 
             </div>
+                    {{-- Account Information --}}
+                    <div class="md:col-span-2 mt-3 pt-6 border-t border-slate-100">
 
+                        <div class="flex items-center gap-3 mb-5">
+
+                            <div
+                                class="w-10 h-10
+                                       rounded-xl
+                                       bg-blue-50
+                                       flex items-center
+                                       justify-center"
+                            >
+                                <svg
+                                    class="w-5 h-5 text-[#123b70]"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="1.8"
+                                        d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"
+                                    />
+                                    <circle
+                                        cx="9"
+                                        cy="7"
+                                        r="4"
+                                        stroke-width="1.8"
+                                    />
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-width="1.8"
+                                        d="M19 8v6M22 11h-6"
+                                    />
+                                </svg>
+                            </div>
+
+                            <div>
+                                <h2 class="text-sm font-semibold text-slate-700">
+                                    Parent Login Account
+                                </h2>
+
+                                <p class="text-xs text-slate-400 mt-0.5">
+                                    Manage the parent's login credentials.
+                                </p>
+                            </div>
+
+                        </div>
+
+
+                        {{-- Account Status --}}
+                        <div class="mb-5">
+
+                            @if ($parent->user_id && $parent->user)
+
+                                <div class="flex items-center gap-2
+                                            px-4 py-3
+                                            rounded-xl
+                                            bg-green-50
+                                            border border-green-100
+                                            text-sm">
+
+                                    <span
+                                        class="w-2 h-2
+                                               rounded-full
+                                               bg-green-500"
+                                    ></span>
+
+                                    <span class="font-semibold text-green-700">
+                                        Login account connected
+                                    </span>
+
+                                </div>
+
+                            @else
+
+                                <div class="flex items-center gap-2
+                                            px-4 py-3
+                                            rounded-xl
+                                            bg-amber-50
+                                            border border-amber-100
+                                            text-sm">
+
+                                    <span
+                                        class="w-2 h-2
+                                               rounded-full
+                                               bg-amber-500"
+                                    ></span>
+
+                                    <span class="font-semibold text-amber-700">
+                                        No login account yet
+                                    </span>
+
+                                </div>
+
+                            @endif
+
+                        </div>
+
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+                            {{-- Email --}}
+                            <div class="md:col-span-2">
+
+                                <label
+                                    for="email"
+                                    class="block text-sm
+                                           font-semibold
+                                           text-slate-600
+                                           mb-2"
+                                >
+                                    Login Email
+                                    <span class="text-red-500">*</span>
+                                </label>
+
+                                <input
+                                    type="email"
+                                    id="email"
+                                    name="email"
+                                    value="{{ old('email', $parent->user?->email) }}"
+                                    required
+                                    class="w-full
+                                           px-4 py-3
+                                           border border-slate-200
+                                           rounded-xl
+                                           text-sm
+                                           text-slate-700
+                                           outline-none
+                                           focus:ring-2
+                                           focus:ring-[#123b70]/20
+                                           focus:border-[#123b70]"
+                                    placeholder="parent@example.com"
+                                >
+
+                            </div>
+
+
+                            {{-- Password --}}
+                            <div>
+
+                                <label
+                                    for="password"
+                                    class="block text-sm
+                                           font-semibold
+                                           text-slate-600
+                                           mb-2"
+                                >
+                                    New Password
+                                </label>
+
+                                <input
+                                    type="password"
+                                    id="password"
+                                    name="password"
+                                    class="w-full
+                                           px-4 py-3
+                                           border border-slate-200
+                                           rounded-xl
+                                           text-sm
+                                           text-slate-700
+                                           outline-none
+                                           focus:ring-2
+                                           focus:ring-[#123b70]/20
+                                           focus:border-[#123b70]"
+                                    placeholder="Enter new password"
+                                >
+
+                                <p class="text-xs text-slate-400 mt-2">
+                                    Leave blank to keep the current password.
+                                </p>
+
+                            </div>
+
+
+                            {{-- Confirm Password --}}
+                            <div>
+
+                                <label
+                                    for="password_confirmation"
+                                    class="block text-sm
+                                           font-semibold
+                                           text-slate-600
+                                           mb-2"
+                                >
+                                    Confirm Password
+                                </label>
+
+                                <input
+                                    type="password"
+                                    id="password_confirmation"
+                                    name="password_confirmation"
+                                    class="w-full
+                                           px-4 py-3
+                                           border border-slate-200
+                                           rounded-xl
+                                           text-sm
+                                           text-slate-700
+                                           outline-none
+                                           focus:ring-2
+                                           focus:ring-[#123b70]/20
+                                           focus:border-[#123b70]"
+                                    placeholder="Confirm new password"
+                                >
+
+                            </div>
+
+                        </div>
+
+                    </div>
 
             {{-- Form Footer --}}
             <div
@@ -350,17 +560,7 @@
 
                 <button
                     type="submit"
-                    class="inline-flex
-                           items-center
-                           gap-2
-                           px-5 py-2.5
-                           rounded-xl
-                           bg-[#123b70]
-                           hover:bg-[#0e2c56]
-                           text-white
-                           text-sm
-                           font-semibold
-                           transition"
+                    class="inline-flex items-center gap-2 bg-[#155d36] hover:bg-[#0f4628] active:bg-[#09321c] text-white font-bold text-sm rounded-xl px-5 py-2.5 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#155d36] focus:ring-offset-2 transition duration-200 border border-[#155d36]"
                 >
                     Save Changes
                 </button>

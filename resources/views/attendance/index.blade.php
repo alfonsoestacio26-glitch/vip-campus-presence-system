@@ -19,32 +19,12 @@
 
                 <a
                     href="{{ route('attendance.create') }}"
-                    class="inline-flex items-center gap-2
-                           bg-[#123b70]
-                           hover:bg-[#0e2c56]
-                           text-white
-                           text-sm font-semibold
-                           px-5 py-2.5
-                           rounded-xl
-                           transition"
+                    class="inline-flex items-center gap-2 bg-[#155d36] hover:bg-[#0f4628] active:bg-[#09321c] text-white font-bold text-sm rounded-xl px-5 py-2.5 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#155d36] focus:ring-offset-2 transition duration-200 border border-[#155d36]"
                 >
-
-                    <svg
-                        class="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                    >
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M12 5v14M5 12h14"
-                        />
+                    <svg class="w-4 h-4 text-white stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14M5 12h14"/>
                     </svg>
-
-                    Add Attendance
-
+                    <span>Add Attendance</span>
                 </a>
 
             </div>
@@ -86,46 +66,32 @@
                     action="{{ route('attendance.index') }}"
                 >
 
-                    <div class="relative">
-
+                    <div class="relative min-w-0">
                         <svg
-                            class="absolute left-4 top-1/2
-                                   -translate-y-1/2
-                                   w-4 h-4
-                                   text-slate-400"
+                            class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
                         >
-                            <circle
-                                cx="11"
-                                cy="11"
-                                r="7"
-                                stroke-width="1.8"
-                            />
-
-                            <path
-                                stroke-linecap="round"
-                                stroke-width="1.8"
-                                d="M20 20l-4-4"
-                            />
+                            <circle cx="11" cy="11" r="7" stroke-width="1.8"/>
+                            <path stroke-linecap="round" stroke-width="1.8" d="M20 20l-4-4"/>
                         </svg>
 
                         <input
                             type="text"
                             name="search"
-                            value="{{ $search ?? '' }}"
-                            placeholder="Search student..."
-                            class="w-full
-                                   pl-11 pr-4 py-3
-                                   border border-slate-200
-                                   rounded-xl
-                                   text-sm
-                                   focus:ring-2
-                                   focus:ring-[#123b70]/20
-                                   focus:border-[#123b70]"
+                            value="{{ $search ?? request('search') }}"
+                            placeholder="Search student by name or student ID..."
+                            class="w-full pl-11 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-[#123b70]/20 focus:border-[#123b70] transition"
                         >
 
+                        @if(request('search'))
+                            <a href="{{ route('attendance.index', request()->except('search')) }}" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1 transition rounded-lg hover:bg-slate-200/50" title="Clear search">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </a>
+                        @endif
                     </div>
 
                 </form>
@@ -282,7 +248,7 @@
                                 {{-- Status --}}
                                 <td class="px-6 py-4">
 
-                                    @if($attendance->status === 'present')
+                                    @if(strtolower($attendance->status) === 'present')
 
                                         <span class="inline-flex
                                                      px-2.5 py-1
@@ -294,7 +260,7 @@
                                             Present
                                         </span>
 
-                                    @elseif($attendance->status === 'late')
+                                    @elseif(strtolower($attendance->status) === 'late')
 
                                         <span class="inline-flex
                                                      px-2.5 py-1
@@ -410,6 +376,13 @@
                 </table>
 
             </div>
+
+            {{-- Pagination --}}
+            @if($attendances->hasPages())
+                <div class="px-6 py-4 border-t border-slate-100 bg-slate-50/50">
+                    {{ $attendances->links() }}
+                </div>
+            @endif
 
         </div>
 

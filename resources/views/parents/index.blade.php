@@ -2,621 +2,301 @@
 
     <div class="max-w-7xl mx-auto">
 
+        {{-- Alerts --}}
+        @if(session('success'))
+            <div class="mb-5 bg-emerald-50 border border-emerald-200 text-emerald-800 px-4 py-3 rounded-xl flex items-center justify-between shadow-xs">
+                <div class="flex items-center gap-3">
+                    <svg class="w-5 h-5 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <span class="text-sm font-medium">{{ session('success') }}</span>
+                </div>
+            </div>
+        @endif
+
+        @if(session('error'))
+            <div class="mb-5 bg-rose-50 border border-rose-200 text-rose-800 px-4 py-3 rounded-xl flex items-center justify-between shadow-xs">
+                <div class="flex items-center gap-3">
+                    <svg class="w-5 h-5 text-rose-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <span class="text-sm font-medium">{{ session('error') }}</span>
+                </div>
+            </div>
+        @endif
+
         {{-- Page Header --}}
         <div class="mb-6">
-
-            <div class="flex items-center justify-between">
-
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
                     <h1 class="text-2xl font-bold text-[#0e2c56]">
-                        Parents
+                        Parents & Guardians
                     </h1>
-
                     <p class="text-sm text-slate-400 mt-1">
-                        Manage parent and guardian records
+                        Manage parent profiles, contact details, and student linkings
                     </p>
                 </div>
 
-
-                {{-- Add Parent --}}
-                <a
-                    href="{{ route('parents.create') }}"
-                    class="inline-flex items-center gap-2
-                           bg-[#123b70]
-                           hover:bg-[#0e2c56]
-                           text-white
-                           text-sm font-semibold
-                           px-5 py-2.5
-                           rounded-xl
-                           transition"
-                >
-
-                    <svg
-                        class="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
+                {{-- Action Buttons --}}
+                <div class="flex items-center flex-wrap gap-2.5">
+                    <a
+                        href="{{ route('parents.create') }}"
+                        class="inline-flex items-center gap-2 bg-[#155d36] hover:bg-[#0f4628] active:bg-[#09321c] text-white font-bold text-sm rounded-xl px-5 py-2.5 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#155d36] focus:ring-offset-2 transition duration-200 border border-[#155d36]"
                     >
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M12 5v14M5 12h14"
-                        />
-                    </svg>
-
-                    Add Parent
-
-                </a>
-
+                        <svg class="w-4 h-4 text-white stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14M5 12h14"/>
+                        </svg>
+                        <span>Add Parent</span>
+                    </a>
+                </div>
             </div>
-
         </div>
 
+        {{-- Filter Toolbar --}}
+        <form method="GET" action="{{ route('parents.index') }}" class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm mb-6">
+            <div class="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
+                
+                {{-- Search Box --}}
+                <div class="relative w-full" style="flex: 1 1 300px; min-width: 280px;">
+                    <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <circle cx="11" cy="11" r="7" stroke-width="1.8"/>
+                        <path stroke-linecap="round" stroke-width="1.8" d="M20 20l-4-4"/>
+                    </svg>
+                    <input
+                        type="text"
+                        name="search"
+                        value="{{ $search ?? request('search') }}"
+                        placeholder="Search by parent name, email, phone, or address..."
+                        class="w-full pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-800 placeholder:text-slate-400 focus:bg-white focus:ring-2 focus:ring-[#123b70]/20 focus:border-[#123b70] transition shadow-xs"
+                    >
+                    @if(request('search'))
+                        <a href="{{ route('parents.index', request()->except('search')) }}" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1 transition rounded-lg hover:bg-slate-200/50" title="Clear search">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </a>
+                    @endif
+                </div>
 
-        {{-- Success Message --}}
-        @if(session('success'))
+                {{-- Dropdowns & Filter Controls --}}
+                <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto" style="flex-shrink: 0;">
+                    @if(!empty($sections) && count($sections) > 0)
+                        <select
+                            name="section"
+                            onchange="this.form.submit()"
+                            class="px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-700 focus:bg-white focus:ring-2 focus:ring-[#123b70]/20 focus:border-[#123b70] transition shadow-xs cursor-pointer"
+                        >
+                            <option value="">All Student Sections</option>
+                            @foreach($sections as $sec)
+                                <option value="{{ $sec }}" {{ ($section ?? '') == $sec ? 'selected' : '' }}>
+                                    Section: {{ $sec }}
+                                </option>
+                            @endforeach
+                        </select>
+                    @endif
 
-            <div
-                class="mb-5
-                       bg-green-50
-                       border border-green-100
-                       text-green-700
-                       px-4 py-3
-                       rounded-xl
-                       text-sm
-                       font-medium"
-            >
-                {{ session('success') }}
+                    <button
+                        type="submit"
+                        class="px-4 py-2.5 bg-[#155d36] hover:bg-[#0f4628] active:bg-[#09321c] text-white text-sm font-semibold rounded-xl shadow-xs transition cursor-pointer"
+                    >
+                        Filter
+                    </button>
+
+                    @if(!empty($search) || !empty($section))
+                        <a
+                            href="{{ route('parents.index') }}"
+                            class="px-3.5 py-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-600 text-sm font-semibold rounded-xl transition cursor-pointer"
+                        >
+                            Reset
+                        </a>
+                    @endif
+                </div>
             </div>
 
-        @endif
+            {{-- Active Filters Badges --}}
+            @if(!empty($search) || !empty($section))
+                <div class="mt-4 pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3 text-xs">
+                    <div class="flex flex-wrap items-center gap-2 text-slate-600">
+                        <span class="font-bold text-slate-400 uppercase tracking-wider text-[10px]">Active Filters:</span>
+                        @if(!empty($search))
+                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 border border-slate-200 text-slate-700">Search: "{{ $search }}"</span>
+                        @endif
+                        @if(!empty($section))
+                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-indigo-50 border border-indigo-200 text-indigo-700">Section: {{ $section }}</span>
+                        @endif
+                    </div>
 
+                    <a href="{{ route('parents.index') }}" class="text-xs font-semibold text-rose-600 hover:text-rose-700 transition">
+                        Clear Filters &times;
+                    </a>
+                </div>
+            @endif
+        </form>
 
         {{-- Parents Table --}}
-        <div
-            class="bg-white
-                   rounded-2xl
-                   border border-slate-200
-                   shadow-sm
-                   overflow-hidden"
-        >
-
-            {{-- Search --}}
-<div class="p-5 border-b border-slate-100">
-
-    <form
-        method="GET"
-        action="{{ route('parents.index') }}"
-        class="relative"
-    >
-
-        <svg
-            class="absolute left-4 top-1/2
-                   -translate-y-1/2
-                   w-4 h-4
-                   text-slate-400"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-        >
-
-            <circle
-                cx="11"
-                cy="11"
-                r="7"
-                stroke-width="1.8"
-            />
-
-            <path
-                stroke-linecap="round"
-                stroke-width="1.8"
-                d="M20 20l-4-4"
-            />
-
-        </svg>
-
-        <input
-        type="text"
-        name="search"
-        value="{{ $search ?? '' }}"
-        placeholder="Search parents..."
-        class="w-full pl-11 pr-4 py-3 border border-slate-200 rounded-xl text-sm"
-    >
-
-    </form>
-
-</div>
-
-
-            {{-- Table --}}
+        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden mb-6">
             <div class="overflow-x-auto">
-
-                <table class="w-full">
-
-                    {{-- Header --}}
-                    <thead
-                        class="bg-slate-50
-                               border-b border-slate-100"
-                    >
-
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-slate-50/80 border-b border-slate-200/80">
                         <tr>
-
-                            <th
-                                class="px-6 py-4
-                                       text-left
-                                       text-xs
-                                       font-semibold
-                                       text-slate-500
-                                       uppercase
-                                       tracking-wide"
-                            >
+                            <th class="py-3.5 px-5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
                                 Parent Name
                             </th>
-
-
-                            <th
-                                class="px-6 py-4
-                                       text-left
-                                       text-xs
-                                       font-semibold
-                                       text-slate-500
-                                       uppercase
-                                       tracking-wide"
-                            >
+                            <th class="py-3.5 px-5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
                                 Phone
                             </th>
-
-
-                            <th
-                                class="px-6 py-4
-                                       text-left
-                                       text-xs
-                                       font-semibold
-                                       text-slate-500
-                                       uppercase
-                                       tracking-wide"
-                            >
+                            <th class="py-3.5 px-5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
                                 Address
                             </th>
-
-
-                            <th
-                                class="px-6 py-4
-                                       text-left
-                                       text-xs
-                                       font-semibold
-                                       text-slate-500
-                                       uppercase
-                                       tracking-wide"
-                            >
-                                Children
+                            <th class="py-3.5 px-5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                                Children Linked
                             </th>
-
-
-                            <th
-                                class="px-6 py-4
-                                       text-right
-                                       text-xs
-                                       font-semibold
-                                       text-slate-500
-                                       uppercase
-                                       tracking-wide"
-                            >
+                            <th class="py-3.5 px-5 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">
                                 Action
                             </th>
-
                         </tr>
-
                     </thead>
-
-
-                    {{-- Body --}}
-                    <tbody>
-
+                    <tbody class="divide-y divide-slate-100">
                         @forelse($parents as $parent)
-
-                            <tr
-                                class="border-b
-                                       border-slate-100
-                                       hover:bg-slate-50
-                                       transition"
-                            >
-
-                                {{-- Parent Name --}}
-                                <td class="px-6 py-4">
-
+                            <tr class="hover:bg-slate-50/70 transition duration-150">
+                                {{-- Parent Name & User email --}}
+                                <td class="py-4 px-5 text-sm align-middle">
                                     <div class="flex items-center gap-3">
-
-                                        {{-- Avatar --}}
-                                        <div
-                                            class="w-10 h-10
-                                                   rounded-full
-                                                   bg-blue-50
-                                                   flex items-center
-                                                   justify-center
-                                                   flex-shrink-0"
-                                        >
-
-                                            <svg
-                                                class="w-5 h-5 text-[#123b70]"
-                                                fill="none"
-                                                stroke="currentColor"
-                                                viewBox="0 0 24 24"
-                                            >
-
-                                                <circle
-                                                    cx="12"
-                                                    cy="8"
-                                                    r="4"
-                                                    stroke-width="1.8"
-                                                />
-
-                                                <path
-                                                    stroke-linecap="round"
-                                                    stroke-width="1.8"
-                                                    d="M4 21a8 8 0 0116 0"
-                                                />
-
-                                            </svg>
-
+                                        <div class="w-9 h-9 rounded-full bg-blue-50 text-[#123b70] font-bold text-xs flex items-center justify-center shrink-0 border border-blue-100">
+                                            {{ strtoupper(substr($parent->first_name, 0, 1)) }}{{ strtoupper(substr($parent->last_name, 0, 1)) }}
                                         </div>
-
-
                                         <div>
-
-                                            <p
-                                                class="text-sm
-                                                       font-semibold
-                                                       text-slate-700"
-                                            >
-
+                                            <p class="font-semibold text-slate-800">
                                                 {{ $parent->first_name }}
-
-                                                @if($parent->middle_name)
-                                                    {{ $parent->middle_name }}
-                                                @endif
-
+                                                @if($parent->middle_name) {{ $parent->middle_name }} @endif
                                                 {{ $parent->last_name }}
-
                                             </p>
-
-
-                                            <p
-                                                class="text-xs
-                                                       text-slate-400
-                                                       mt-0.5"
-                                            >
-                                                Parent / Guardian
+                                            <p class="text-xs text-slate-400 mt-0.5">
+                                                {{ $parent->user->email ?? 'No user account' }}
                                             </p>
-
                                         </div>
-
                                     </div>
-
                                 </td>
-
 
                                 {{-- Phone --}}
-                                <td
-                                    class="px-6 py-4
-                                           text-sm
-                                           text-slate-500"
-                                >
-
+                                <td class="py-4 px-5 text-sm text-slate-600 whitespace-nowrap">
                                     {{ $parent->phone ?? '—' }}
-
                                 </td>
-
 
                                 {{-- Address --}}
-                                <td
-                                    class="px-6 py-4
-                                           text-sm
-                                           text-slate-500
-                                           max-w-xs"
-                                >
-
+                                <td class="py-4 px-5 text-sm text-slate-600 max-w-xs">
                                     <span class="line-clamp-2">
-
                                         {{ $parent->address ?? '—' }}
-
                                     </span>
-
                                 </td>
-
 
                                 {{-- Children --}}
-                                <td class="px-6 py-4">
-
-                                    {{-- Relationship will be used once linked --}}
+                                <td class="py-4 px-5 text-sm">
                                     @if($parent->students && $parent->students->count())
-
-                                        <div class="flex items-center gap-2">
-
-                                            <span
-                                                class="inline-flex
-                                                       items-center
-                                                       justify-center
-                                                       min-w-7 h-7
-                                                       px-2
-                                                       rounded-lg
-                                                       bg-blue-50
-                                                       text-[#123b70]
-                                                       text-xs
-                                                       font-bold"
-                                            >
-                                                {{ $parent->students->count() }}
-                                            </span>
-
-                                            <span
-                                                class="text-xs
-                                                       text-slate-500"
-                                            >
-                                                {{ $parent->students->count() === 1 ? 'Student' : 'Students' }}
-                                            </span>
-
+                                        <div class="flex flex-col gap-1">
+                                            <div class="flex items-center gap-2">
+                                                <span class="inline-flex items-center justify-center px-2 py-0.5 rounded-full bg-blue-50 text-[#123b70] text-xs font-bold border border-blue-100">
+                                                    {{ $parent->students->count() }} {{ Str::plural('Child', $parent->students->count()) }}
+                                                </span>
+                                            </div>
+                                            <div class="flex flex-wrap gap-1 mt-1">
+                                                @foreach($parent->students as $child)
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded bg-slate-100 text-slate-700 text-xs font-medium">
+                                                        {{ $child->first_name }} {{ $child->last_name }}
+                                                        @if($child->section)
+                                                            <span class="text-slate-400 ml-1">({{ $child->section }})</span>
+                                                        @endif
+                                                    </span>
+                                                @endforeach
+                                            </div>
                                         </div>
-
                                     @else
-
-                                        <span
-                                            class="text-sm
-                                                   text-slate-400"
-                                        >
-                                            —
-                                        </span>
-
+                                        <span class="text-xs text-slate-400 italic">No linked children</span>
                                     @endif
-
                                 </td>
 
-
                                 {{-- Actions --}}
-                                <td class="px-6 py-4">
-
-                                    <div
-                                        class="flex
-                                               items-center
-                                               justify-end
-                                               gap-4"
-                                    >
-
+                                <td class="py-4 px-5 text-right text-sm whitespace-nowrap">
+                                    <div class="flex items-center justify-end gap-1.5">
                                         {{-- View --}}
                                         <a
                                             href="{{ route('parents.show', $parent) }}"
-                                            class="text-[#123b70]
-                                                   hover:text-[#0e2c56]
-                                                   transition"
-                                            title="View Parent"
+                                            class="p-2 text-[#123b70] hover:text-[#0e2c56] hover:bg-blue-50 rounded-xl transition"
+                                            title="View Parent Profile"
                                         >
-
-                                            <svg
-                                                class="w-5 h-5"
-                                                fill="none"
-                                                stroke="currentColor"
-                                                viewBox="0 0 24 24"
-                                            >
-
-                                                <path
-                                                    stroke-linecap="round"
-                                                    stroke-linejoin="round"
-                                                    stroke-width="1.8"
-                                                    d="M2.5 12s3.5-6 9.5-6
-                                                       9.5 6 9.5 6
-                                                       -3.5 6-9.5 6
-                                                       -9.5-6-9.5-6z"
-                                                />
-
-                                                <circle
-                                                    cx="12"
-                                                    cy="12"
-                                                    r="2.5"
-                                                    stroke-width="1.8"
-                                                />
-
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6z"/>
+                                                <circle cx="12" cy="12" r="2.5" stroke-width="1.8"/>
                                             </svg>
-
                                         </a>
-
 
                                         {{-- Edit --}}
                                         <a
                                             href="{{ route('parents.edit', $parent) }}"
-                                            class="text-amber-500
-                                                   hover:text-amber-600
-                                                   transition"
+                                            class="p-2 text-amber-600 hover:text-amber-700 hover:bg-amber-50 rounded-xl transition"
                                             title="Edit Parent"
                                         >
-
-                                            <svg
-                                                class="w-5 h-5"
-                                                fill="none"
-                                                stroke="currentColor"
-                                                viewBox="0 0 24 24"
-                                            >
-
-                                                <path
-                                                    stroke-linecap="round"
-                                                    stroke-linejoin="round"
-                                                    stroke-width="1.8"
-                                                    d="M12 20h9"
-                                                />
-
-                                                <path
-                                                    stroke-linecap="round"
-                                                    stroke-linejoin="round"
-                                                    stroke-width="1.8"
-                                                    d="M16.5 3.5a2.1 2.1 0 013 3L8 18l-4 1 1-4L16.5 3.5z"
-                                                />
-
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 20h9"/>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16.5 3.5a2.1 2.1 0 013 3L8 18l-4 1 1-4L16.5 3.5z"/>
                                             </svg>
-
                                         </a>
-
 
                                         {{-- Delete --}}
                                         <form
                                             action="{{ route('parents.destroy', $parent) }}"
                                             method="POST"
                                             class="inline"
-                                            onsubmit="return confirm('Are you sure you want to delete this parent?');"
+                                            onsubmit="return confirm('Are you sure you want to delete this parent record?');"
                                         >
-
                                             @csrf
-
                                             @method('DELETE')
-
                                             <button
                                                 type="submit"
-                                                class="text-red-500
-                                                       hover:text-red-600
-                                                       transition"
+                                                class="p-2 text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded-xl transition cursor-pointer"
                                                 title="Delete Parent"
                                             >
-
-                                                <svg
-                                                    class="w-5 h-5"
-                                                    fill="none"
-                                                    stroke="currentColor"
-                                                    viewBox="0 0 24 24"
-                                                >
-
-                                                    <path
-                                                        stroke-linecap="round"
-                                                        stroke-linejoin="round"
-                                                        stroke-width="1.8"
-                                                        d="M4 7h16"
-                                                    />
-
-                                                    <path
-                                                        stroke-linecap="round"
-                                                        stroke-linejoin="round"
-                                                        stroke-width="1.8"
-                                                        d="M10 11v6M14 11v6"
-                                                    />
-
-                                                    <path
-                                                        stroke-linecap="round"
-                                                        stroke-linejoin="round"
-                                                        stroke-width="1.8"
-                                                        d="M6 7l1 13h10l1-13"
-                                                    />
-
-                                                    <path
-                                                        stroke-linecap="round"
-                                                        stroke-linejoin="round"
-                                                        stroke-width="1.8"
-                                                        d="M9 7V4h6v3"
-                                                    />
-
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>
                                                 </svg>
-
                                             </button>
-
                                         </form>
-
                                     </div>
-
                                 </td>
-
                             </tr>
-
                         @empty
-
-                            {{-- Empty State --}}
                             <tr>
-
-                                <td
-                                    colspan="5"
-                                    class="px-6 py-20
-                                           text-center"
-                                >
-
-                                    <div
-                                        class="flex
-                                               flex-col
-                                               items-center"
-                                    >
-
-                                        <div
-                                            class="w-12 h-12
-                                                   rounded-full
-                                                   bg-slate-50
-                                                   flex items-center
-                                                   justify-center
-                                                   mb-4"
-                                        >
-
-                                            <svg
-                                                class="w-6 h-6 text-slate-300"
-                                                fill="none"
-                                                stroke="currentColor"
-                                                viewBox="0 0 24 24"
-                                            >
-
-                                                <circle
-                                                    cx="9"
-                                                    cy="7"
-                                                    r="4"
-                                                    stroke-width="1.8"
-                                                />
-
-                                                <path
-                                                    stroke-linecap="round"
-                                                    stroke-linejoin="round"
-                                                    stroke-width="1.8"
-                                                    d="M2 21a7 7 0 0114 0"
-                                                />
-
+                                <td colspan="5" class="px-6 py-16 text-center">
+                                    <div class="flex flex-col items-center justify-center max-w-sm mx-auto">
+                                        <div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mb-3">
+                                            <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <circle cx="12" cy="8" r="4" stroke-width="1.5"/>
+                                                <path stroke-linecap="round" stroke-width="1.5" d="M4 21a8 8 0 0116 0"/>
                                             </svg>
-
                                         </div>
-
-
-                                        <p
-                                            class="text-sm
-                                                   font-semibold
-                                                   text-slate-500"
-                                        >
-                                            No parents yet
-                                        </p>
-
-
-                                        <p
-                                            class="text-xs
-                                                   text-slate-400
-                                                   mt-1"
-                                        >
-                                            Parent records will appear here.
-                                        </p>
-
-
-                                        <a
-                                            href="{{ route('parents.create') }}"
-                                            class="mt-4
-                                                   text-sm
-                                                   font-semibold
-                                                   text-[#123b70]
-                                                   hover:underline"
-                                        >
-                                            Add your first parent
-                                        </a>
-
+                                        @if(!empty($search) || !empty($section))
+                                            <h3 class="text-sm font-semibold text-slate-800">No matching parent records</h3>
+                                            <p class="text-xs text-slate-400 mt-1">We couldn't find any parents matching your current filter criteria.</p>
+                                            <a href="{{ route('parents.index') }}" class="mt-3 text-xs font-semibold text-[#123b70] hover:underline">Clear search & filters</a>
+                                        @else
+                                            <h3 class="text-sm font-semibold text-slate-800">No parents registered yet</h3>
+                                            <p class="text-xs text-slate-400 mt-1">Start by creating your first parent or guardian record.</p>
+                                            <a href="{{ route('parents.create') }}" class="mt-4 inline-flex items-center gap-1.5 bg-[#155d36] hover:bg-[#0f4628] active:bg-[#09321c] text-white font-bold text-xs rounded-xl px-4 py-2 shadow-sm hover:shadow-md transition duration-200 border border-[#155d36]">Add First Parent</a>
+                                        @endif
                                     </div>
-
                                 </td>
-
                             </tr>
-
                         @endforelse
-
                     </tbody>
-
                 </table>
-
             </div>
 
+            {{-- Pagination Links --}}
+            @if($parents->hasPages())
+                <div class="px-6 py-4 border-t border-slate-100 bg-slate-50/50">
+                    {{ $parents->withQueryString()->links() }}
+                </div>
+            @endif
         </div>
 
     </div>

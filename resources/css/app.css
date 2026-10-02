@@ -2,13 +2,43 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+    --brand-green: #155d36;
+    --brand-green-dark: #0f4628;
+    --brand-green-light: #1b7444;
+    --brand-bg: #faf7f0;
+    --brand-bg-alt: #f6f3eb;
+    --brand-card: #ffffff;
+    --brand-blue: #4d88df;
+    --brand-coral: #eb5757;
+    --brand-gold: #f2c94c;
+}
+
+body {
+    background-color: var(--brand-bg);
+    color: #1a3322;
+}
+
+/* =========================================================
+   HIDE SCROLLBAR UTILITY
+   ========================================================= */
+
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
 
 /* =========================================================
    SIDEBAR
    ========================================================= */
 
 .sidebar-link {
-    @apply flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/75 hover:bg-white/10 hover:text-white transition duration-200 text-sm font-medium;
+    @apply flex items-center gap-3 px-3 py-2.5 rounded-xl text-white/80 hover:bg-white/15 hover:text-white transition duration-200 text-sm font-medium;
 }
 
 
@@ -29,7 +59,7 @@
 
 /* Active sidebar item */
 .sidebar-active {
-    @apply bg-white/15 text-white;
+    @apply bg-white/20 text-white font-semibold shadow-sm;
 }
 
 
@@ -38,22 +68,22 @@
    ========================================================= */
 
 .dashboard-card {
-    @apply bg-white rounded-2xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition duration-200;
+    @apply bg-white rounded-2xl border border-stone-200/80 p-5 shadow-sm hover:shadow-md transition duration-200;
 }
 
 
 .card-label {
-    @apply text-sm font-medium text-slate-500;
+    @apply text-xs font-semibold text-stone-400 uppercase tracking-wider;
 }
 
 
 .card-empty {
-    @apply text-3xl font-bold text-slate-300 mt-2;
+    @apply text-3xl font-extrabold text-[#155d36] mt-1;
 }
 
 
 .card-link {
-    @apply text-xs font-semibold text-[#2f5995] mt-2 inline-block;
+    @apply text-xs font-semibold text-[#155d36] hover:text-[#0f4628] transition inline-flex items-center gap-1 mt-3;
 }
 
 
@@ -62,7 +92,7 @@
    ========================================================= */
 
 .stat-icon {
-    @apply w-11 h-11 rounded-xl flex items-center justify-center;
+    @apply w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0;
 }
 
 
@@ -71,22 +101,22 @@
    ========================================================= */
 
 .dashboard-panel {
-    @apply bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden;
+    @apply bg-white rounded-2xl border border-stone-200/80 shadow-sm overflow-hidden;
 }
 
 
 .panel-header {
-    @apply px-5 py-4 border-b border-slate-100 flex items-center justify-between;
+    @apply px-6 py-4 border-b border-stone-100 flex items-center justify-between;
 }
 
 
 .panel-title {
-    @apply text-sm font-bold text-[#0e2c56];
+    @apply text-base font-bold text-[#155d36];
 }
 
 
 .panel-subtitle {
-    @apply text-xs text-slate-400 mt-1;
+    @apply text-xs text-stone-400 mt-0.5;
 }
 
 
@@ -95,5 +125,5 @@
    ========================================================= */
 
 .table-heading {
-    @apply text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide;
+    @apply text-left px-5 py-3 text-xs font-semibold text-stone-500 uppercase tracking-wide;
 }

@@ -19,9 +19,41 @@ class Attendance extends Model
 
     protected $casts = [
         'attendance_date' => 'date',
-        'time_in' => 'datetime',
-        'time_out' => 'datetime',
     ];
+
+    public function getTimeInAttribute($value)
+    {
+        if (!$value) {
+            return null;
+        }
+        return $value instanceof \Carbon\Carbon ? $value : \Carbon\Carbon::parse($value);
+    }
+
+    public function getTimeOutAttribute($value)
+    {
+        if (!$value) {
+            return null;
+        }
+        return $value instanceof \Carbon\Carbon ? $value : \Carbon\Carbon::parse($value);
+    }
+
+    public function setTimeInAttribute($value)
+    {
+        if ($value instanceof \DateTimeInterface) {
+            $this->attributes['time_in'] = $value->format('H:i:s');
+        } else {
+            $this->attributes['time_in'] = $value;
+        }
+    }
+
+    public function setTimeOutAttribute($value)
+    {
+        if ($value instanceof \DateTimeInterface) {
+            $this->attributes['time_out'] = $value->format('H:i:s');
+        } else {
+            $this->attributes['time_out'] = $value;
+        }
+    }
 
     public function student()
     {

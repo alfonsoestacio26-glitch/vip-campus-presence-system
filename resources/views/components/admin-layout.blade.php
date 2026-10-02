@@ -14,24 +14,24 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="bg-[#f4f7fb] text-[#0e2c56] antialiased">
+<body class="bg-[#faf7f0] text-[#1a3322] antialiased min-h-screen">
 
     <div class="min-h-screen flex">
 
         {{-- ================= SIDEBAR ================= --}}
-        <aside class="w-64 bg-[#123b70] text-white flex flex-col fixed inset-y-0 left-0 z-40">
+        <aside class="w-64 bg-[#155d36] text-white flex flex-col fixed inset-y-0 left-0 z-40 h-screen shadow-xl">
 
-            {{-- Logo --}}
-            <div class="h-24 px-6 flex items-center border-b border-white/10">
+            {{-- Logo Header --}}
+            <div class="h-20 px-6 flex items-center border-b border-white/10 flex-shrink-0">
 
                 <img
                     src="{{ asset('images/logo.png') }}"
                     alt="VIP Learning Center"
-                    class="w-12 h-12 object-contain bg-white rounded-xl p-1"
+                    class="w-10 h-10 object-contain bg-white rounded-xl p-1 shadow-sm"
                 >
 
                 <div class="ml-3">
-                    <h1 class="font-bold text-sm">
+                    <h1 class="font-bold text-sm leading-tight text-white">
                         VIP Learning
                     </h1>
 
@@ -43,235 +43,275 @@
             </div>
 
 
-            {{-- Navigation --}}
-            <nav class="flex-1 px-4 py-5 space-y-1 overflow-y-auto">
+            {{-- Navigation Items --}}
+            <nav class="flex-1 px-4 py-5 space-y-4 overflow-y-auto no-scrollbar">
 
-                {{-- Dashboard --}}
-                <a
-                    href="{{ url('/admin/dashboard') }}"
-                    class="sidebar-link
-                    {{ request()->is('admin/dashboard')
-                        ? 'bg-white/15 text-white'
-                        : '' }}"
-                >
-                    <svg class="sidebar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="1.8"
-                              d="M3 12l9-9 9 9M5 10v10h14V10M9 20v-6h6v6"/>
-                    </svg>
+                {{-- MAIN --}}
+                <div class="space-y-1">
+                    <div class="px-3 text-[10px] font-bold uppercase tracking-wider text-white/40 select-none">
+                        MAIN
+                    </div>
 
-                    <span>Dashboard</span>
-                </a>
+                    {{-- Dashboard --}}
+                    <a
+                        href="{{ url('/admin/dashboard') }}"
+                        class="sidebar-link
+                        {{ request()->is('admin/dashboard')
+                            ? 'bg-white/20 text-white font-semibold shadow-xs'
+                            : '' }}"
+                    >
+                        <svg class="sidebar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  stroke-width="1.8"
+                                  d="M3 12l9-9 9 9M5 10v10h14V10M9 20v-6h6v6"/>
+                        </svg>
 
-
-                {{-- Students --}}
-                <a
-                    href="{{ route('students.index') }}"
-                    class="sidebar-link
-                    {{ request()->is('students*')
-                        ? 'bg-white/15 text-white'
-                        : '' }}"
-                >
-                    <svg class="sidebar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="1.8"
-                              d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/>
-                        <circle cx="9" cy="7" r="4"
-                                stroke-width="1.8"/>
-                        <path stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="1.8"
-                              d="M22 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
-                    </svg>
-
-                    <span>Students</span>
-                </a>
+                        <span>Dashboard</span>
+                    </a>
+                </div>
 
 
-                {{-- Parents --}}
-                <a
-                    href="{{ route('parents.index') }}"
-                    class="sidebar-link
-                    {{ request()->is('parents*')
-                        ? 'bg-white/15 text-white'
-                        : '' }}"
-                >
-                    <svg class="sidebar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <circle cx="9" cy="7" r="4"
-                                stroke-width="1.8"/>
+                {{-- MANAGEMENT --}}
+                <div class="space-y-1">
+                    <div class="px-3 text-[10px] font-bold uppercase tracking-wider text-white/40 select-none">
+                        MANAGEMENT
+                    </div>
 
-                        <path stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="1.8"
-                              d="M2 21a7 7 0 0114 0"/>
+                    {{-- Students --}}
+                    <a
+                        href="{{ route('students.index') }}"
+                        class="sidebar-link
+                        {{ request()->is('students*')
+                            ? 'bg-white/20 text-white font-semibold shadow-xs'
+                            : '' }}"
+                    >
+                        <svg class="sidebar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  stroke-width="1.8"
+                                  d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/>
+                            <circle cx="9" cy="7" r="4"
+                                    stroke-width="1.8"/>
+                            <path stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  stroke-width="1.8"
+                                  d="M22 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
+                        </svg>
 
-                        <circle cx="17" cy="8" r="3"
-                                stroke-width="1.8"/>
-
-                        <path stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="1.8"
-                              d="M17 13a5 5 0 015 5"/>
-                    </svg>
-
-                    <span>Parents</span>
-                </a>
-
-
-                {{-- Teachers --}}
-                <a
-                    href="{{ route('teachers.index') }}"
-                    class="sidebar-link
-                    {{ request()->is('teachers*')
-                        ? 'bg-white/15 text-white'
-                        : '' }}"
-                >
-                    <svg class="sidebar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <circle cx="12" cy="7" r="4"
-                                stroke-width="1.8"/>
-
-                        <path stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="1.8"
-                              d="M4 21a8 8 0 0116 0"/>
-                    </svg>
-
-                    <span>Teachers</span>
-                </a>
+                        <span>Students</span>
+                    </a>
 
 
-                {{-- Guards --}}
-                <a
-                    href="{{ route('guards.index') }}"
-                    class="sidebar-link
-                    {{ request()->is('guards*')
-                        ? 'bg-white/15 text-white'
-                        : '' }}"
-                >
-                    <svg class="sidebar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    {{-- Parents --}}
+                    <a
+                        href="{{ route('parents.index') }}"
+                        class="sidebar-link
+                        {{ request()->is('parents*')
+                            ? 'bg-white/20 text-white font-semibold shadow-xs'
+                            : '' }}"
+                    >
+                        <svg class="sidebar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <circle cx="9" cy="7" r="4"
+                                    stroke-width="1.8"/>
 
-                        <path stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="1.8"
-                              d="M12 3l7 3v5c0 4.5-3 8.5-7 10-4-1.5-7-5.5-7-10V6l7-3z"/>
+                            <path stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  stroke-width="1.8"
+                                  d="M2 21a7 7 0 0114 0"/>
 
-                        <path stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="1.8"
-                              d="M9 12l2 2 4-4"/>
+                            <circle cx="17" cy="8" r="3"
+                                    stroke-width="1.8"/>
 
-                    </svg>
+                            <path stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  stroke-width="1.8"
+                                  d="M17 13a5 5 0 015 5"/>
+                        </svg>
 
-                    <span>Guards</span>
-                </a>
-
-
-                {{-- Attendance --}}
-                <a href="#" class="sidebar-link">
-
-                    <svg class="sidebar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-
-                        <rect x="4" y="5" width="16" height="16"
-                              rx="2"
-                              stroke-width="1.8"/>
-
-                        <path stroke-linecap="round"
-                              stroke-width="1.8"
-                              d="M8 3v4M16 3v4M4 10h16"/>
-
-                    </svg>
-
-                    <span>Attendance</span>
-
-                </a>
+                        <span>Parents</span>
+                    </a>
 
 
-                {{-- Reports --}}
-                <a href="#" class="sidebar-link">
+                    {{-- Teachers --}}
+                    <a
+                        href="{{ route('teachers.index') }}"
+                        class="sidebar-link
+                        {{ request()->is('teachers*')
+                            ? 'bg-white/20 text-white font-semibold shadow-xs'
+                            : '' }}"
+                    >
+                        <svg class="sidebar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <circle cx="12" cy="7" r="4"
+                                    stroke-width="1.8"/>
 
-                    <svg class="sidebar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  stroke-width="1.8"
+                                  d="M4 21a8 8 0 0116 0"/>
+                        </svg>
 
-                        <path stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="1.8"
-                              d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>
-
-                    </svg>
-
-                    <span>Reports</span>
-
-                </a>
-
-
-                {{-- Announcements --}}
-                <a href="#" class="sidebar-link">
-
-                    <svg class="sidebar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-
-                        <path stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="1.8"
-                              d="M4 12h4l8-5v10l-8-5H4z"/>
-
-                        <path stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="1.8"
-                              d="M8 12l1.5 6h2L10 13"/>
-
-                    </svg>
-
-                    <span>Announcements</span>
-
-                </a>
+                        <span>Teachers</span>
+                    </a>
 
 
-                {{-- SMS Logs --}}
-                <a href="#" class="sidebar-link">
+                    {{-- Guards --}}
+                    <a
+                        href="{{ route('guards.index') }}"
+                        class="sidebar-link
+                        {{ request()->is('guards*')
+                            ? 'bg-white/20 text-white font-semibold shadow-xs'
+                            : '' }}"
+                    >
+                        <svg class="sidebar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 
-                    <svg class="sidebar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  stroke-width="1.8"
+                                  d="M12 3l7 3v5c0 4.5-3 8.5-7 10-4-1.5-7-5.5-7-10V6l7-3z"/>
 
-                        <rect x="3" y="4" width="18" height="14"
-                              rx="2"
-                              stroke-width="1.8"/>
+                            <path stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  stroke-width="1.8"
+                                  d="M9 12l2 2 4-4"/>
 
-                        <path stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="1.8"
-                              d="M7 21h10M8 9h8M8 13h5"/>
+                        </svg>
 
-                    </svg>
-
-                    <span>SMS Logs</span>
-
-                </a>
+                        <span>Guards</span>
+                    </a>
+                </div>
 
 
-                {{-- Settings --}}
-                <a href="#" class="sidebar-link">
+                {{-- ATTENDANCE --}}
+                <div class="space-y-1">
+                    <div class="px-3 text-[10px] font-bold uppercase tracking-wider text-white/40 select-none">
+                        ATTENDANCE
+                    </div>
 
-                    <svg class="sidebar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    {{-- Attendance --}}
+                    <a
+                        href="{{ route('attendance.index') }}"
+                        class="sidebar-link
+                        {{ request()->is('attendance*')
+                            ? 'bg-white/20 text-white font-semibold shadow-xs'
+                            : '' }}"
+                    >
+                        <svg class="sidebar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 
-                        <circle cx="12" cy="12" r="3"
-                                stroke-width="1.8"/>
+                            <rect x="4" y="5" width="16" height="16"
+                                  rx="2"
+                                  stroke-width="1.8"/>
 
-                        <path stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="1.8"
-                              d="M19.4 15a1.7 1.7 0 00.3 1.9l.1.1-1.8 1.8-.1-.1a1.7 1.7 0 00-1.9-.3 1.7 1.7 0 00-1 1.6v.2h-2.6V20a1.7 1.7 0 00-1-1.6 1.7 1.7 0 00-1.9.3l-.1.1-1.8-1.8.1-.1a1.7 1.7 0 00.3-1.9 1.7 1.7 0 00-1.6-1H5.2v-2.6H5a1.7 1.7 0 001.6-1 1.7 1.7 0 00-.3-1.9l-.1-.1L8 8.5l.1.1a1.7 1.7 0 001.9.3 1.7 1.7 0 001-1.6V7h2.6v.2a1.7 1.7 0 001 1.6 1.7 1.7 0 001.9-.3l.1-.1 1.8 1.8-.1.1a1.7 1.7 0 00-.3 1.9 1.7 1.7 0 001.6 1h.2v2.6h-.2a1.7 1.7 0 00-1.6 1z"/>
+                            <path stroke-linecap="round"
+                                  stroke-width="1.8"
+                                  d="M8 3v4M16 3v4M4 10h16"/>
 
-                    </svg>
+                        </svg>
 
-                    <span>Settings</span>
+                        <span>Attendance</span>
 
-                </a>
+                    </a>
+
+
+                    {{-- Reports --}}
+                    <a href="#" class="sidebar-link">
+
+                        <svg class="sidebar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+
+                            <path stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  stroke-width="1.8"
+                                  d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>
+
+                        </svg>
+
+                        <span>Reports</span>
+
+                    </a>
+                </div>
+
+
+                {{-- COMMUNICATION --}}
+                <div class="space-y-1">
+                    <div class="px-3 text-[10px] font-bold uppercase tracking-wider text-white/40 select-none">
+                        COMMUNICATION
+                    </div>
+
+                    {{-- Announcements --}}
+                    <a href="#" class="sidebar-link">
+
+                        <svg class="sidebar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+
+                            <path stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  stroke-width="1.8"
+                                  d="M4 12h4l8-5v10l-8-5H4z"/>
+
+                            <path stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  stroke-width="1.8"
+                                  d="M8 12l1.5 6h2L10 13"/>
+
+                        </svg>
+
+                        <span>Announcements</span>
+
+                    </a>
+
+
+                    {{-- SMS Logs --}}
+                    <a href="#" class="sidebar-link">
+
+                        <svg class="sidebar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+
+                            <rect x="3" y="4" width="18" height="14"
+                                  rx="2"
+                                  stroke-width="1.8"/>
+
+                            <path stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  stroke-width="1.8"
+                                  d="M7 21h10M8 9h8M8 13h5"/>
+
+                        </svg>
+
+                        <span>SMS Logs</span>
+
+                    </a>
+                </div>
+
+
+                {{-- SYSTEM --}}
+                <div class="space-y-1">
+                    <div class="px-3 text-[10px] font-bold uppercase tracking-wider text-white/40 select-none">
+                        SYSTEM
+                    </div>
+
+                    {{-- Settings --}}
+                    <a href="#" class="sidebar-link">
+
+                        <svg class="sidebar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+
+                            <circle cx="12" cy="12" r="3"
+                                    stroke-width="1.8"/>
+
+                            <path stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  stroke-width="1.8"
+                                  d="M19.4 15a1.7 1.7 0 00.3 1.9l.1.1-1.8 1.8-.1-.1a1.7 1.7 0 00-1.9-.3 1.7 1.7 0 00-1 1.6v.2h-2.6V20a1.7 1.7 0 00-1-1.6 1.7 1.7 0 00-1.9.3l-.1.1-1.8-1.8.1-.1a1.7 1.7 0 00.3-1.9 1.7 1.7 0 00-1.6-1H5.2v-2.6H5a1.7 1.7 0 001.6-1 1.7 1.7 0 00-.3-1.9l-.1-.1L8 8.5l.1.1a1.7 1.7 0 001.9.3 1.7 1.7 0 001-1.6V7h2.6v.2a1.7 1.7 0 001 1.6 1.7 1.7 0 001.9-.3l.1-.1 1.8 1.8-.1.1a1.7 1.7 0 00-.3 1.9 1.7 1.7 0 001.6 1h.2v2.6h-.2a1.7 1.7 0 00-1.6 1z"/>
+
+                        </svg>
+
+                        <span>Settings</span>
+
+                    </a>
+                </div>
 
             </nav>
 
 
-            {{-- Logout --}}
-            <div class="p-4 border-t border-white/10">
+            {{-- Logout Footer --}}
+            <div class="p-4 border-t border-white/10 flex-shrink-0">
 
                 <form method="POST" action="{{ route('logout') }}">
 
@@ -279,7 +319,7 @@
 
                     <button
                         type="submit"
-                        class="sidebar-link w-full"
+                        class="sidebar-link w-full text-left"
                     >
 
                         <svg class="sidebar-icon"
@@ -309,29 +349,27 @@
         </aside>
 
 
-        {{-- ================= MAIN CONTENT ================= --}}
-        <div class="ml-64 flex-1 min-h-screen">
+        {{-- ================= MAIN CONTENT AREA ================= --}}
+        <div class="ml-64 flex-1 min-h-screen flex flex-col">
 
             {{-- Top Header --}}
-            <header class="h-20 bg-white border-b border-slate-200 flex items-center justify-between px-8">
+            <header class="h-20 bg-white border-b border-stone-200/80 border-t-4 border-t-[#155d36] flex items-center justify-between px-8 sticky top-0 z-30 shadow-xs">
 
                 <div>
-
-                    <h2 class="text-2xl font-bold text-[#0e2c56]">
+                    <h1 class="text-xl font-bold text-[#155d36] tracking-tight">
                         Admin Dashboard
-                    </h2>
+                    </h1>
 
-                    <p class="text-sm text-slate-400">
+                    <p class="text-xs font-medium text-stone-400">
                         Campus Management Overview
                     </p>
-
                 </div>
 
 
                 <div class="flex items-center gap-5">
 
                     {{-- Notification --}}
-                    <button class="relative text-[#0e2c56]">
+                    <button class="relative p-2 rounded-xl text-stone-500 hover:text-[#155d36] hover:bg-stone-100 transition">
 
                         <svg class="w-5 h-5"
                              fill="none"
@@ -345,44 +383,34 @@
 
                         </svg>
 
-                        <span class="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                        <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-[#eb5757] rounded-full"></span>
 
                     </button>
 
+                    <div class="h-8 w-px bg-stone-200"></div>
 
-                    {{-- User --}}
-                    <div class="flex items-center gap-3">
+                    {{-- Administrator Profile --}}
+                    <div class="flex items-center gap-3 cursor-pointer">
 
-                        <div class="w-10 h-10 rounded-full bg-[#123b70] flex items-center justify-center text-white">
-
-                            <svg class="w-5 h-5"
-                                 fill="none"
-                                 stroke="currentColor"
-                                 viewBox="0 0 24 24">
-
-                                <circle cx="12" cy="8" r="4"
-                                        stroke-width="1.8"/>
-
-                                <path stroke-linecap="round"
-                                      stroke-linejoin="round"
-                                      stroke-width="1.8"
-                                      d="M4 21a8 8 0 0116 0"/>
-
-                            </svg>
-
+                        <div class="w-10 h-10 rounded-full bg-[#155d36] text-white flex items-center justify-center font-bold text-sm shadow-xs">
+                            {{ strtoupper(substr(auth()->user()->name ?? 'Test User', 0, 1)) }}
                         </div>
 
                         <div>
 
-                            <p class="text-sm font-semibold text-[#0e2c56]">
-                                {{ auth()->user()->name ?? 'Admin' }}
+                            <p class="text-sm font-semibold text-[#155d36] leading-tight">
+                                {{ auth()->user()->name ?? 'Test User' }}
                             </p>
 
-                            <p class="text-xs text-slate-400">
-                                Administrator
+                            <p class="text-xs text-stone-400">
+                                {{ ucfirst(auth()->user()->role ?? 'Administrator') }}
                             </p>
 
                         </div>
+
+                        <svg class="w-4 h-4 text-stone-400 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
 
                     </div>
 
@@ -392,7 +420,7 @@
 
 
             {{-- Page Content --}}
-            <main class="p-8">
+            <main class="flex-1 p-6 lg:p-8 max-w-[1600px] w-full mx-auto">
 
                 {{ $slot }}
 

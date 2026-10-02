@@ -9,25 +9,101 @@ use Illuminate\Support\Facades\Storage;
 class StudentController extends Controller
 {
     /**
-     * Display all students for admin.
+     * Display all students for admin with multi-field filtering and pagination.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $students = Student::with('parents')
-            ->latest()
-            ->get();
+        $search = trim($request->input('search', ''));
+        $grade = $request->input('grade_level');
+        $section = $request->input('section');
+        $status = $request->input('status');
 
-        return view('students.index', compact('students'));
+        $gradeLevels = Student::distinct()->whereNotNull('grade_level')->where('grade_level', '!=', '')->pluck('grade_level')->sort()->values();
+        $sections = Student::distinct()->whereNotNull('section')->where('section', '!=', '')->pluck('section')->sort()->values();
+        $statuses = Student::distinct()->whereNotNull('status')->where('status', '!=', '')->pluck('status')->sort()->values();
+
+        $query = Student::with('parents');
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('student_no', 'like', "%{$search}%")
+                  ->orWhere('first_name', 'like', "%{$search}%")
+                  ->orWhere('middle_name', 'like', "%{$search}%")
+                  ->orWhere('last_name', 'like', "%{$search}%")
+                  ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%{$search}%"])
+                  ->orWhereRaw("CONCAT(first_name, ' ', middle_name, ' ', last_name) LIKE ?", ["%{$search}%"]);
+            });
+        }
+
+        if ($grade) {
+            $query->where('grade_level', $grade);
+        }
+
+        if ($section) {
+            $query->where('section', $section);
+        }
+
+        if ($status) {
+            $query->where('status', $status);
+        }
+
+        $students = $query->latest()->paginate(15)->withQueryString();
+
+        return view('students.index', compact(
+            'students',
+            'search',
+            'grade',
+            'section',
+            'status',
+            'gradeLevels',
+            'sections',
+            'statuses'
+        ));
     }
 
     /**
-     * Display students for teachers.
+     * Display students for teachers restricted to teacher's section.
      */
-    public function teacherIndex()
+    public function teacherIndex(Request $request)
     {
-        $students = Student::latest()->get();
+        $user = auth()->user();
+        $teacher = $user->role === 'teacher' ? $user->teacher : null;
+        $assignedSections = $teacher ? $teacher->assigned_sections : [];
 
-        return view('teacher.students.index', compact('students'));
+        $search = trim($request->input('search', ''));
+        $status = $request->input('status');
+        $section = $request->input('section');
+
+        $query = Student::query();
+
+        if ($user->role === 'teacher') {
+            if (empty($assignedSections)) {
+                $query->whereRaw('1 = 0');
+            } elseif ($section && in_array($section, $assignedSections)) {
+                $query->where('section', $section);
+            } else {
+                $query->whereIn('section', $assignedSections);
+            }
+        } elseif ($section) {
+            $query->where('section', $section);
+        }
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('student_no', 'like', "%{$search}%")
+                  ->orWhere('first_name', 'like', "%{$search}%")
+                  ->orWhere('last_name', 'like', "%{$search}%")
+                  ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%{$search}%"]);
+            });
+        }
+
+        if ($status) {
+            $query->where('status', $status);
+        }
+
+        $students = $query->orderBy('last_name')->orderBy('first_name')->paginate(15)->withQueryString();
+
+        return view('teacher.students.index', compact('students', 'search', 'status', 'section'));
     }
 
     /**
@@ -35,6 +111,7 @@ class StudentController extends Controller
      */
     public function teacherShow(Student $student)
     {
+
         $student->load([
             'attendances' => function ($query) {
                 $query

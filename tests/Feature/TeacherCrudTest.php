@@ -92,7 +92,7 @@ class TeacherCrudTest extends TestCase
 
         $response
             ->assertSessionHasNoErrors()
-            ->assertRedirect(route('teachers.index'));
+            ->assertRedirect(route('teachers.show', $teacher));
 
         $this->assertDatabaseHas('teachers', [
             'id' => $teacher->id,

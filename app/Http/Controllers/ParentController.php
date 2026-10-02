@@ -4,34 +4,52 @@ namespace App\Http\Controllers;
 
 use App\Models\ParentProfile;
 use App\Models\Student;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ParentController extends Controller
 {
     /**
-     * Display all parents.
+     * Display all parents for admin with search, section filter, and pagination.
      */
     public function index(Request $request)
     {
-        $search = $request->input('search');
+        $search = trim($request->input('search', ''));
+        $section = $request->input('section');
 
-        $parents = ParentProfile::query()
-            ->when($search, function ($query, $search) {
-                $query->where(function ($q) use ($search) {
-                    $q->where('first_name', 'like', "%{$search}%")
-                        ->orWhere('middle_name', 'like', "%{$search}%")
-                        ->orWhere('last_name', 'like', "%{$search}%")
-                        ->orWhere('phone', 'like', "%{$search}%")
-                        ->orWhere('address', 'like', "%{$search}%");
-                });
-            })
-            ->with('students')
-            ->latest()
-            ->get();
+        // Dynamic sections list from linked student records
+        $sections = Student::distinct()->whereNotNull('section')->where('section', '!=', '')->pluck('section')->sort()->values();
+
+        $query = ParentProfile::query()->with(['students', 'user']);
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('first_name', 'like', "%{$search}%")
+                    ->orWhere('middle_name', 'like', "%{$search}%")
+                    ->orWhere('last_name', 'like', "%{$search}%")
+                    ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%{$search}%"])
+                    ->orWhere('phone', 'like', "%{$search}%")
+                    ->orWhere('address', 'like', "%{$search}%")
+                    ->orWhereHas('user', function ($uQ) use ($search) {
+                        $uQ->where('email', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        if ($section) {
+            $query->whereHas('students', function ($sQ) use ($section) {
+                $sQ->where('section', $section);
+            });
+        }
+
+        $parents = $query->latest()->paginate(15)->withQueryString();
 
         return view('parents.index', compact(
             'parents',
-            'search'
+            'search',
+            'section',
+            'sections'
         ));
     }
 
@@ -68,27 +86,12 @@ class ParentController extends Controller
      */
     public function show(ParentProfile $parent)
     {
-        /*
-        |--------------------------------------------------------------------------
-        | Load students already linked to this parent
-        |--------------------------------------------------------------------------
-        */
-        $parent->load('students');
+        $parent->load(['students', 'user']);
 
-        /*
-        |--------------------------------------------------------------------------
-        | Get IDs of already linked students
-        |--------------------------------------------------------------------------
-        */
         $linkedStudentIds = $parent->students
             ->pluck('id')
             ->toArray();
 
-        /*
-        |--------------------------------------------------------------------------
-        | Get students that are NOT yet linked
-        |--------------------------------------------------------------------------
-        */
         $students = Student::query()
             ->when(count($linkedStudentIds) > 0, function ($query) use ($linkedStudentIds) {
                 $query->whereNotIn('id', $linkedStudentIds);
@@ -115,11 +118,6 @@ class ParentController extends Controller
             'relationship' => 'required|string|max:50',
         ]);
 
-        /*
-        |--------------------------------------------------------------------------
-        | Prevent duplicate relationship
-        |--------------------------------------------------------------------------
-        */
         if (
             $parent->students()
                 ->where('student_id', $validated['student_id'])
@@ -130,11 +128,6 @@ class ParentController extends Controller
                 ->with('error', 'This student is already linked to this parent.');
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Attach student
-        |--------------------------------------------------------------------------
-        */
         $parent->students()->attach(
             $validated['student_id'],
             [
@@ -166,29 +159,118 @@ class ParentController extends Controller
      */
     public function edit(ParentProfile $parent)
     {
+        $parent->load('user');
+
         return view('parents.edit', compact('parent'));
     }
 
     /**
-     * Update parent.
+     * Update parent and manage parent login account.
      */
     public function update(
         Request $request,
         ParentProfile $parent
     ) {
-        $validated = $request->validate([
+        $parent->load('user');
+
+        $rules = [
             'first_name' => 'required|string|max:100',
             'middle_name' => 'nullable|string|max:100',
             'last_name' => 'required|string|max:100',
             'phone' => 'nullable|string|max:30',
             'address' => 'nullable|string|max:255',
-        ]);
 
-        $parent->update($validated);
+            'email' => [
+                'required',
+                'email',
+                'max:255',
+                'unique:users,email' . ($parent->user_id ? ',' . $parent->user_id : ''),
+            ],
+
+            'password' => 'nullable|string|min:8|confirmed',
+        ];
+
+        $validated = $request->validate($rules);
+
+        DB::transaction(function () use ($validated, $parent) {
+
+            /*
+            |--------------------------------------------------------------------------
+            | Update Parent Profile
+            |--------------------------------------------------------------------------
+            */
+
+            $parent->update([
+                'first_name' => $validated['first_name'],
+                'middle_name' => $validated['middle_name'] ?? null,
+                'last_name' => $validated['last_name'],
+                'phone' => $validated['phone'] ?? null,
+                'address' => $validated['address'] ?? null,
+            ]);
+
+            /*
+            |--------------------------------------------------------------------------
+            | Prepare Parent Account Name
+            |--------------------------------------------------------------------------
+            */
+
+            $accountName = trim(
+                $validated['first_name'] . ' ' .
+                ($validated['middle_name'] ?? '') . ' ' .
+                $validated['last_name']
+            );
+
+            /*
+            |--------------------------------------------------------------------------
+            | Existing User Account
+            |--------------------------------------------------------------------------
+            */
+
+            if ($parent->user) {
+
+                $userData = [
+                    'name' => $accountName,
+                    'email' => $validated['email'],
+                    'role' => 'parent',
+                ];
+
+                /*
+                | Only change password when Admin entered a new one.
+                */
+                if (!empty($validated['password'])) {
+                    $userData['password'] = $validated['password'];
+                }
+
+                $parent->user->update($userData);
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | No User Account Yet
+            |--------------------------------------------------------------------------
+            */
+
+            else {
+
+                $user = User::create([
+                    'name' => $accountName,
+                    'email' => $validated['email'],
+                    'password' => $validated['password'],
+                    'role' => 'parent',
+                ]);
+
+                /*
+                | Link the new User to the existing ParentProfile.
+                */
+                $parent->update([
+                    'user_id' => $user->id,
+                ]);
+            }
+        });
 
         return redirect()
             ->route('parents.index')
-            ->with('success', 'Parent updated successfully.');
+            ->with('success', 'Parent information and account updated successfully.');
     }
 
     /**
@@ -196,7 +278,14 @@ class ParentController extends Controller
      */
     public function destroy(ParentProfile $parent)
     {
-        $parent->delete();
+        \Illuminate\Support\Facades\DB::transaction(function () use ($parent) {
+            $user = $parent->user;
+            $parent->students()->detach();
+            $parent->delete();
+            if ($user) {
+                $user->delete();
+            }
+        });
 
         return redirect()
             ->route('parents.index')
@@ -212,12 +301,18 @@ class ParentController extends Controller
             'photo' => 'required|image|mimes:jpeg,png,jpg,webp|max:3072',
         ]);
 
-        if ($parent->photo && \Illuminate\Support\Facades\Storage::disk('public')->exists($parent->photo)) {
+        if (
+            $parent->photo &&
+            \Illuminate\Support\Facades\Storage::disk('public')->exists($parent->photo)
+        ) {
             \Illuminate\Support\Facades\Storage::disk('public')->delete($parent->photo);
         }
 
         $path = $request->file('photo')->store('parents/photos', 'public');
-        $parent->update(['photo' => $path]);
+
+        $parent->update([
+            'photo' => $path
+        ]);
 
         return back()->with('success', 'Parent photo updated successfully.');
     }

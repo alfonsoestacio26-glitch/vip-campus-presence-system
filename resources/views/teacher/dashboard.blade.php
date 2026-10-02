@@ -1,675 +1,556 @@
 @extends('layouts.teacher')
 
-@section('page-title', 'Teacher Presence Dashboard')
+@section('page-title', 'Teacher Dashboard')
+@section('page-subtitle', 'Overview of section attendance and real-time campus presence')
 
 @section('content')
 
-<div class="max-w-7xl mx-auto" x-data="{
-    excuseModal: false,
-    selectedStudent: null,
-    selectedStatus: 'Excused',
-    selectedRemarks: '',
-    openExcuseModal(student, currentStatus, currentRemarks) {
-        this.selectedStudent = student;
-        this.selectedStatus = currentStatus === 'Absent' ? 'Excused' : currentStatus;
-        this.selectedRemarks = currentRemarks || '';
-        this.excuseModal = true;
-    },
-    setQuickRemark(text) {
-        this.selectedRemarks = text;
-        this.selectedStatus = 'Excused';
-    }
-}">
+@php
+    $attendanceTotal = $totalStudents ?? 0;
+    $present = $presentToday ?? 0;
+    $late = $lateToday ?? 0;
+    $absent = $absentToday ?? 0;
+    $excused = $excusedToday ?? 0;
+    $inside = $insideCampus ?? 0;
+    $departed = $departedToday ?? 0;
 
-    {{-- SUCCESS ALERT --}}
+    $presentRate = $attendanceTotal > 0 ? round(($present / $attendanceTotal) * 100) : 0;
+    $lateRate = $attendanceTotal > 0 ? round(($late / $attendanceTotal) * 100) : 0;
+    $absentRate = $attendanceTotal > 0 ? round(($absent / $attendanceTotal) * 100) : 0;
+@endphp
+
+<div class="space-y-6">
+
+    {{-- =========================================================
+         FLASH NOTIFICATIONS
+    ========================================================== --}}
     @if(session('success'))
-        <div class="mb-6 bg-emerald-50 border border-emerald-200 text-emerald-800 px-5 py-3.5 rounded-2xl flex items-center justify-between shadow-sm">
-            <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-600">
-                    <i class="fa-solid fa-circle-check"></i>
-                </div>
-                <span class="text-sm font-semibold">{{ session('success') }}</span>
+        <div class="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm font-semibold flex items-center justify-between shadow-xs">
+            <div class="flex items-center gap-2">
+                <svg class="w-5 h-5 text-emerald-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <span>{{ session('success') }}</span>
             </div>
-            <button type="button" onclick="this.parentElement.remove()" class="text-emerald-600 hover:text-emerald-800">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
+            <button onclick="this.parentElement.remove()" class="text-emerald-500 hover:text-emerald-800 text-xs font-bold">&times;</button>
         </div>
     @endif
 
-    {{-- PAGE HEADER & SECTION FILTER --}}
-    <div class="bg-white border border-slate-200 rounded-3xl p-6 mb-7 shadow-sm">
-        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
+
+    {{-- =========================================================
+         WELCOME BANNER & CLASSROOM FILTER TOOLBAR
+    ========================================================== --}}
+    {{-- =========================================================
+         WELCOME BANNER & CLASSROOM FILTER TOOLBAR
+    ========================================================== --}}
+    <div class="relative overflow-hidden rounded-2xl bg-white border border-stone-200/80 p-6 shadow-sm border-t-4 border-t-[#155d36] flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+
+        <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-2xl bg-[#155d36] text-white flex items-center justify-center shadow-md flex-shrink-0">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 14l9-5-9-5-9 5 9 5z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 01-6.824-2.998 12.078 12.078 0 01-6.824-2.998L12 14z"/>
+                </svg>
+            </div>
+
             <div>
-                <div class="flex items-center gap-3">
-                    <div class="w-11 h-11 rounded-2xl bg-[#0e2c56] text-white flex items-center justify-center shadow-md shadow-[#0e2c56]/10">
-                        <i class="fa-solid fa-chalkboard-user text-lg"></i>
-                    </div>
-                    <div>
-                        <h1 class="text-xl font-bold text-[#0e2c56]">
-                            Class Presence & Attendance Terminal
-                        </h1>
-                        <p class="text-xs text-slate-400 mt-0.5">
-                            Real-time gate verification, section monitoring, and absence/excuse management
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            {{-- FILTER FORM --}}
-            <form method="GET" action="{{ route('teacher.dashboard') }}" class="flex flex-wrap items-center gap-3">
-                {{-- Date Filter --}}
-                <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs">
-                    <i class="fa-regular fa-calendar text-slate-400"></i>
-                    <input 
-                        type="date" 
-                        name="date" 
-                        value="{{ $selectedDate }}" 
-                        onchange="this.form.submit()"
-                        class="bg-transparent border-0 p-0 text-xs font-semibold text-slate-700 focus:ring-0 cursor-pointer"
-                    >
-                </div>
-
-                {{-- Section Filter --}}
-                <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs">
-                    <i class="fa-solid fa-layer-group text-slate-400"></i>
-                    <select 
-                        name="section" 
-                        onchange="this.form.submit()"
-                        class="bg-transparent border-0 p-0 text-xs font-semibold text-slate-700 focus:ring-0 cursor-pointer"
-                    >
-                        <option value="">All Sections</option>
-                        @foreach($sections as $sec)
-                            <option value="{{ $sec }}" {{ $selectedSection == $sec ? 'selected' : '' }}>
-                                Section {{ $sec }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-
-                {{-- Grade Filter --}}
-                <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs">
-                    <i class="fa-solid fa-graduation-cap text-slate-400"></i>
-                    <select 
-                        name="grade_level" 
-                        onchange="this.form.submit()"
-                        class="bg-transparent border-0 p-0 text-xs font-semibold text-slate-700 focus:ring-0 cursor-pointer"
-                    >
-                        <option value="">All Grades</option>
-                        @foreach($gradeLevels as $gl)
-                            <option value="{{ $gl }}" {{ $selectedGrade == $gl ? 'selected' : '' }}>
-                                Grade {{ $gl }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-
-                @if($selectedSection || $selectedGrade || $selectedDate != \Carbon\Carbon::now('Asia/Manila')->toDateString() || $search)
-                    <a 
-                        href="{{ route('teacher.dashboard') }}" 
-                        class="text-xs text-rose-600 hover:text-rose-800 font-semibold px-2 py-2"
-                        title="Reset Filters"
-                    >
-                        Reset
-                    </a>
-                @endif
-            </form>
-        </div>
-    </div>
-
-
-    {{-- ============================================== --}}
-    {{-- KPI METRICS CARDS --}}
-    {{-- ============================================== --}}
-    <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4 mb-7">
-
-        {{-- TOTAL ENROLLED --}}
-        <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm relative overflow-hidden">
-            <div class="flex items-center justify-between">
-                <span class="text-xs font-semibold text-slate-500">Cohort Enrolled</span>
-                <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-xs">
-                    <i class="fa-solid fa-users"></i>
-                </div>
-            </div>
-            <div class="mt-3">
-                <span class="text-2xl font-black text-[#0e2c56]">{{ $totalStudents }}</span>
-                <span class="text-[11px] text-slate-400 block mt-0.5">Students registered</span>
-            </div>
-        </div>
-
-        {{-- CURRENTLY INSIDE CAMPUS --}}
-        <div class="bg-white border border-emerald-200/80 rounded-2xl p-4 shadow-sm relative overflow-hidden bg-gradient-to-b from-white to-emerald-50/20">
-            <div class="flex items-center justify-between">
-                <span class="text-xs font-semibold text-emerald-700 flex items-center gap-1.5">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
-                    Inside Campus
-                </span>
-                <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs">
-                    <i class="fa-solid fa-school-flag"></i>
-                </div>
-            </div>
-            <div class="mt-3">
-                <span class="text-2xl font-black text-emerald-600">{{ $insideCampus }}</span>
-                <span class="text-[11px] text-emerald-600/80 block mt-0.5">On grounds now</span>
-            </div>
-        </div>
-
-        {{-- DEPARTED --}}
-        <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm relative overflow-hidden">
-            <div class="flex items-center justify-between">
-                <span class="text-xs font-semibold text-slate-500">Departed</span>
-                <div class="w-8 h-8 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center text-xs">
-                    <i class="fa-solid fa-door-open"></i>
-                </div>
-            </div>
-            <div class="mt-3">
-                <span class="text-2xl font-black text-sky-700">{{ $departedToday }}</span>
-                <span class="text-[11px] text-slate-400 block mt-0.5">Scanned out</span>
-            </div>
-        </div>
-
-        {{-- TARDY / LATE --}}
-        <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm relative overflow-hidden">
-            <div class="flex items-center justify-between">
-                <span class="text-xs font-semibold text-slate-500">Tardy / Late</span>
-                <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-xs">
-                    <i class="fa-solid fa-clock"></i>
-                </div>
-            </div>
-            <div class="mt-3">
-                <span class="text-2xl font-black text-amber-600">{{ $lateToday }}</span>
-                <span class="text-[11px] text-slate-400 block mt-0.5">Past cutoff</span>
-            </div>
-        </div>
-
-        {{-- EXCUSED --}}
-        <div class="bg-white border border-purple-200/80 rounded-2xl p-4 shadow-sm relative overflow-hidden bg-gradient-to-b from-white to-purple-50/20">
-            <div class="flex items-center justify-between">
-                <span class="text-xs font-semibold text-purple-700">Excused</span>
-                <div class="w-8 h-8 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center text-xs">
-                    <i class="fa-solid fa-file-signature"></i>
-                </div>
-            </div>
-            <div class="mt-3">
-                <span class="text-2xl font-black text-purple-700">{{ $excusedToday }}</span>
-                <span class="text-[11px] text-purple-600/80 block mt-0.5">With teacher note</span>
-            </div>
-        </div>
-
-        {{-- UNEXCUSED / ABSENT --}}
-        <div class="bg-white border border-rose-200/80 rounded-2xl p-4 shadow-sm relative overflow-hidden bg-gradient-to-b from-white to-rose-50/20">
-            <div class="flex items-center justify-between">
-                <span class="text-xs font-semibold text-rose-700">Absent</span>
-                <div class="w-8 h-8 rounded-lg bg-rose-100 text-rose-700 flex items-center justify-center text-xs">
-                    <i class="fa-solid fa-user-xmark"></i>
-                </div>
-            </div>
-            <div class="mt-3">
-                <span class="text-2xl font-black text-rose-600">{{ $absentToday }}</span>
-                <span class="text-[11px] text-rose-600/80 block mt-0.5">Not checked in</span>
-            </div>
-        </div>
-
-    </div>
-
-
-    {{-- ============================================== --}}
-    {{-- MAIN GRID: STUDENT ROSTER & LIVE FEED --}}
-    {{-- ============================================== --}}
-    <div class="grid grid-cols-1 xl:grid-cols-4 gap-7 mb-8">
-
-        {{-- STUDENT ATTENDANCE LIST (3 COLS) --}}
-        <div class="xl:col-span-3 bg-white border border-slate-200 rounded-3xl shadow-sm overflow-hidden flex flex-col">
-            
-            {{-- HEADER & SEARCH --}}
-            <div class="p-6 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div>
-                    <h2 class="text-base font-bold text-[#0e2c56] flex items-center gap-2">
-                        <span>Student Section Presence</span>
-                        <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700">
-                            {{ $students->count() }} enrolled
-                        </span>
-                    </h2>
-                    <p class="text-xs text-slate-400 mt-0.5">
-                        Presence verification logs for {{ \Carbon\Carbon::parse($selectedDate)->format('F d, Y') }}
-                    </p>
-                </div>
-
-                {{-- Search inside cohort --}}
-                <form method="GET" action="{{ route('teacher.dashboard') }}" class="relative w-full sm:w-64">
-                    <input type="hidden" name="date" value="{{ $selectedDate }}">
-                    <input type="hidden" name="section" value="{{ $selectedSection }}">
-                    <input type="hidden" name="grade_level" value="{{ $selectedGrade }}">
-                    <input 
-                        type="text" 
-                        name="search" 
-                        value="{{ $search }}" 
-                        placeholder="Search student or ID..." 
-                        class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-[#0e2c56]/20 focus:border-[#0e2c56]"
-                    >
-                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-                </form>
-            </div>
-
-            {{-- TABLE --}}
-            <div class="overflow-x-auto flex-1">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-slate-50/70 border-b border-slate-100 text-[11px] uppercase font-bold text-slate-400 tracking-wider">
-                            <th class="py-3.5 px-6">Student</th>
-                            <th class="py-3.5 px-4">Level & Section</th>
-                            <th class="py-3.5 px-4">Time In</th>
-                            <th class="py-3.5 px-4">Time Out</th>
-                            <th class="py-3.5 px-4">Campus Presence</th>
-                            <th class="py-3.5 px-6 text-right">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-100 text-xs">
-                        @forelse($students as $student)
-                            @php
-                                $att = $student->attendance_record;
-                                $status = $student->presence_status;
-                            @endphp
-                            <tr class="hover:bg-slate-50/80 transition group">
-                                {{-- Student Profile --}}
-                                <td class="py-4 px-6">
-                                    <div class="flex items-center gap-3">
-                                        <img 
-                                            src="{{ $student->photo_url }}" 
-                                            alt="{{ $student->first_name }}"
-                                            class="w-10 h-10 rounded-xl object-cover border border-slate-200 shadow-sm shrink-0"
-                                        >
-                                        <div>
-                                            <a href="{{ route('teacher.students.show', $student) }}" class="font-bold text-[#0e2c56] hover:text-blue-600 transition block leading-tight">
-                                                {{ $student->first_name }}
-                                                @if($student->middle_name)
-                                                    {{ substr($student->middle_name, 0, 1) }}.
-                                                @endif
-                                                {{ $student->last_name }}
-                                            </a>
-                                            <span class="text-[11px] font-mono text-slate-400">{{ $student->student_no }}</span>
-                                        </div>
-                                    </div>
-                                </td>
-
-                                {{-- Level & Section --}}
-                                <td class="py-4 px-4 text-slate-600">
-                                    <span class="font-semibold text-slate-700">Grade {{ $student->grade_level }}</span>
-                                    <span class="text-slate-400 block text-[11px]">{{ $student->section ?: 'General' }}</span>
-                                </td>
-
-                                {{-- Time In --}}
-                                <td class="py-4 px-4 font-mono">
-                                    @if($att && $att->time_in)
-                                        <span class="font-semibold text-slate-800">
-                                            {{ \Carbon\Carbon::parse($att->time_in)->format('h:i A') }}
-                                        </span>
-                                        <span class="text-[10px] text-emerald-600 block">Gate In Verified</span>
-                                    @else
-                                        <span class="text-slate-300 font-sans">—</span>
-                                    @endif
-                                </td>
-
-                                {{-- Time Out --}}
-                                <td class="py-4 px-4 font-mono">
-                                    @if($att && $att->time_out)
-                                        <span class="font-semibold text-slate-800">
-                                            {{ \Carbon\Carbon::parse($att->time_out)->format('h:i A') }}
-                                        </span>
-                                        <span class="text-[10px] text-sky-600 block">Gate Out Verified</span>
-                                    @elseif($att && $att->time_in)
-                                        <span class="text-amber-500 font-sans text-[11px] italic">Still inside</span>
-                                    @else
-                                        <span class="text-slate-300 font-sans">—</span>
-                                    @endif
-                                </td>
-
-                                {{-- Status Badge --}}
-                                <td class="py-4 px-4">
-                                    @if($status === 'Inside Campus')
-                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                                            Inside Campus
-                                        </span>
-                                    @elseif($status === 'Departed')
-                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-sky-50 text-sky-700 border border-sky-200">
-                                            <i class="fa-solid fa-person-walking-arrow-right text-[10px]"></i>
-                                            Departed
-                                        </span>
-                                    @elseif($status === 'Late')
-                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
-                                            <i class="fa-solid fa-clock text-[10px]"></i>
-                                            Late Arrival
-                                        </span>
-                                    @elseif($status === 'Excused')
-                                        <div class="group/excuse relative inline-block">
-                                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-purple-50 text-purple-700 border border-purple-200 cursor-pointer">
-                                                <i class="fa-solid fa-notes-medical text-[10px]"></i>
-                                                Excused
-                                            </span>
-                                            @if($att && $att->remarks)
-                                                <span class="text-[11px] text-purple-600 block mt-0.5 truncate max-w-[140px]" title="{{ $att->remarks }}">
-                                                    {{ $att->remarks }}
-                                                </span>
-                                            @endif
-                                        </div>
-                                    @else
-                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
-                                            Absent
-                                        </span>
-                                    @endif
-                                </td>
-
-                                {{-- Actions: Excuse / Update --}}
-                                <td class="py-4 px-6 text-right">
-                                    <div class="flex items-center justify-end gap-2">
-                                        <button 
-                                            type="button"
-                                            @click="openExcuseModal({{ json_encode($student) }}, '{{ $att ? $att->status : 'Absent' }}', '{{ $att ? addslashes($att->remarks) : '' }}')"
-                                            class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-[#0e2c56] hover:text-white text-slate-700 rounded-lg text-xs font-semibold transition shadow-sm"
-                                            title="Mark Excused or Adjust Attendance"
-                                        >
-                                            <i class="fa-solid fa-pen-to-square text-[11px]"></i>
-                                            <span>Excuse / Edit</span>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="6" class="py-16 text-center">
-                                    <div class="max-w-xs mx-auto text-slate-400">
-                                        <i class="fa-solid fa-clipboard-question text-4xl mb-3 text-slate-300"></i>
-                                        <p class="font-bold text-slate-600 text-sm">No students found</p>
-                                        <p class="text-xs text-slate-400 mt-1">Try adjusting section or grade filters above.</p>
-                                    </div>
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-
-            {{-- FOOTER / ATTENDANCE RATE --}}
-            <div class="p-5 bg-slate-50 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-xs text-slate-500">
-                <div class="flex items-center gap-2">
-                    <span class="font-semibold text-slate-700">Section Attendance Rate:</span>
-                    <span class="px-2.5 py-0.5 rounded-full font-bold {{ $presenceRate >= 80 ? 'bg-emerald-100 text-emerald-700' : ($presenceRate >= 50 ? 'bg-amber-100 text-amber-700' : 'bg-rose-100 text-rose-700') }}">
-                        {{ $presenceRate }}%
+                <div class="flex items-center gap-2.5 flex-wrap">
+                    <h1 class="text-xl font-bold text-[#155d36]">
+                        Good day, {{ auth()->user()->teacher ? explode(' ', trim(auth()->user()->teacher->first_name))[0] : explode(' ', trim(auth()->user()->name))[0] }}!
+                    </h1>
+                    <span id="live-indicator" class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        Live Sync
                     </span>
-                    <span class="text-slate-400">({{ $presentToday }} of {{ $totalStudents }} students present)</span>
                 </div>
 
-                <a href="{{ route('teacher.attendance.index') }}" class="font-semibold text-[#0e2c56] hover:underline flex items-center gap-1">
-                    <span>View Full Log History</span>
-                    <i class="fa-solid fa-arrow-right text-[10px]"></i>
-                </a>
+                <p class="text-xs text-stone-500 mt-1 font-medium">
+                    Attendance records for <span class="font-bold text-stone-700">{{ \Carbon\Carbon::parse($selectedDate)->format('F j, Y') }}</span>.
+                </p>
             </div>
-
         </div>
 
 
-        {{-- SIDEBAR: GATE SCAN FEED & SUMMARY (1 COL) --}}
-        <div class="space-y-6">
+        {{-- Section / Class Read-Only Tag & Filter Form --}}
+        <form method="GET" action="{{ route('teacher.dashboard') }}" class="flex flex-wrap items-end gap-3">
 
-            {{-- SECTION SUMMARY RADIAL PROGRESS --}}
-            <div class="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm">
-                <h3 class="text-sm font-bold text-[#0e2c56] mb-1">Presence Distribution</h3>
-                <p class="text-xs text-slate-400 mb-6">Current campus breakdown</p>
-
-                <div class="flex flex-col items-center">
-                    <div 
-                        class="w-36 h-36 rounded-full flex items-center justify-center p-3.5 shadow-inner"
-                        style="background: conic-gradient(
-                            #10b981 0% {{ $presenceRate }}%,
-                            #cbd5e1 {{ $presenceRate }}% 100%
-                        );"
-                    >
-                        <div class="w-full h-full bg-white rounded-full flex flex-col items-center justify-center shadow-sm">
-                            <span class="text-2xl font-black text-[#0e2c56]">{{ $presenceRate }}%</span>
-                            <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Present</span>
-                        </div>
-                    </div>
-
-                    <div class="w-full mt-6 space-y-2.5 text-xs">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-2">
-                                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-                                <span class="text-slate-600 font-medium">Inside Campus</span>
-                            </div>
-                            <span class="font-bold text-slate-800">{{ $insideCampus }}</span>
-                        </div>
-
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-2">
-                                <span class="w-2.5 h-2.5 rounded-full bg-sky-500"></span>
-                                <span class="text-slate-600 font-medium">Departed</span>
-                            </div>
-                            <span class="font-bold text-slate-800">{{ $departedToday }}</span>
-                        </div>
-
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-2">
-                                <span class="w-2.5 h-2.5 rounded-full bg-purple-500"></span>
-                                <span class="text-slate-600 font-medium">Excused</span>
-                            </div>
-                            <span class="font-bold text-slate-800">{{ $excusedToday }}</span>
-                        </div>
-
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-2">
-                                <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
-                                <span class="text-slate-600 font-medium">Absent</span>
-                            </div>
-                            <span class="font-bold text-slate-800">{{ $absentToday }}</span>
-                        </div>
-                    </div>
+            {{-- Assigned Class/Section Read-only Badge --}}
+            <div class="flex flex-col">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-stone-400 mb-1">Class / Section</span>
+                <div class="inline-flex items-center gap-1.5 bg-emerald-50/80 border border-emerald-200/80 text-[#155d36] px-3.5 py-2 rounded-xl text-xs font-bold shadow-2xs whitespace-nowrap h-[38px]">
+                    <svg class="w-4 h-4 text-[#155d36] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5m0 0h5"/>
+                    </svg>
+                    <span>Section {{ $selectedSection ?: ($sections->implode(', ') ?: 'Unassigned') }}</span>
                 </div>
             </div>
 
-            {{-- LIVE GATE SCANS WIDGET --}}
-            <div class="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm">
-                <div class="flex items-center justify-between mb-4">
-                    <div>
-                        <h3 class="text-sm font-bold text-[#0e2c56]">Live Gate Scans</h3>
-                        <p class="text-[11px] text-slate-400">Terminal kiosk feed</p>
-                    </div>
-                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" title="Live Gateway Feed Active"></span>
+            {{-- Date Filter --}}
+            <div class="flex flex-col">
+                <label for="filter-date" class="text-[10px] font-bold uppercase tracking-wider text-stone-400 mb-1">Attendance Date</label>
+                <input
+                    type="date"
+                    id="filter-date"
+                    name="date"
+                    value="{{ $selectedDate }}"
+                    onchange="this.form.submit()"
+                    class="bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-xs font-semibold text-stone-700 focus:outline-none focus:ring-2 focus:ring-[#155d36]/20 cursor-pointer h-[38px]"
+                >
+            </div>
+
+            {{-- Search Student --}}
+            <div class="flex flex-col">
+                <label for="filter-search" class="text-[10px] font-bold uppercase tracking-wider text-stone-400 mb-1">Search Student</label>
+                <div class="relative">
+                    <input
+                        type="text"
+                        id="filter-search"
+                        name="search"
+                        value="{{ $search }}"
+                        placeholder="Search student or ID..."
+                        class="bg-stone-50 border border-stone-200 rounded-xl pl-8 pr-3 py-2 text-xs font-medium text-stone-700 focus:outline-none focus:ring-2 focus:ring-[#155d36]/20 w-48 h-[38px]"
+                    >
+                    <svg class="w-3.5 h-3.5 text-stone-400 absolute left-2.5 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="flex items-end">
+                <button type="submit" class="bg-[#155d36] hover:bg-[#0f4628] text-white text-xs font-semibold px-4.5 py-2 rounded-xl transition shadow-xs h-[38px] flex items-center gap-1.5">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+                    </svg>
+                    <span>Apply Filter</span>
+                </button>
+            </div>
+
+        </form>
+
+    </div>
+
+
+    {{-- =========================================================
+         4 CORE METRIC CARDS
+    ========================================================== --}}
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+
+        {{-- 1. TOTAL ASSIGNED STUDENTS --}}
+        <div class="dashboard-card flex flex-col justify-between">
+            <div class="flex items-start justify-between">
+                <div>
+                    <p class="card-label">Total Students</p>
+                    <p id="kpi-total" class="card-empty text-[#155d36]">{{ $totalStudents }}</p>
                 </div>
 
-                <div class="space-y-3">
-                    @forelse($recentScans as $scan)
-                        <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-100 text-xs">
-                            <div class="flex items-center gap-2.5 truncate">
-                                <img src="{{ $scan->student->photo_url }}" class="w-8 h-8 rounded-lg object-cover border border-slate-200 shrink-0">
-                                <div class="truncate">
-                                    <p class="font-bold text-[#0e2c56] truncate">
-                                        {{ $scan->student->first_name }} {{ $scan->student->last_name }}
-                                    </p>
-                                    <p class="text-[10px] text-slate-400 font-mono">
-                                        {{ $scan->student->student_no }}
-                                    </p>
+                <div class="w-12 h-12 rounded-xl bg-[#4d88df]/15 text-[#4d88df] border border-[#4d88df]/30 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17 20h5v-2a4 4 0 00-4-4h-1M9 20H4v-2a4 4 0 014-4h1m4-8a4 4 0 11-8 0 4 4 0 018 0zm6 3a3 3 0 10-6 0"/>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between mt-4">
+                <span class="text-xs text-stone-400">Active roster count</span>
+                <span class="text-xs font-semibold text-[#4d88df] bg-[#4d88df]/10 px-2 py-0.5 rounded-full">Roster Active</span>
+            </div>
+        </div>
+
+
+        {{-- 2. TODAY'S PRESENT --}}
+        <div class="dashboard-card flex flex-col justify-between">
+            <div class="flex items-start justify-between">
+                <div>
+                    <p class="card-label text-[#155d36]">Today's Present</p>
+                    <p id="kpi-present" class="card-empty text-[#155d36]">{{ $present }}</p>
+                </div>
+
+                <div class="w-12 h-12 rounded-xl bg-[#155d36]/15 text-[#155d36] border border-[#155d36]/30 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between mt-4">
+                <span id="kpi-present-rate" class="text-xs font-semibold text-[#155d36]">{{ $presentRate }}% attendance rate</span>
+                <span class="text-xs text-stone-400 font-mono">{{ $inside }} inside / {{ $departed }} left</span>
+            </div>
+        </div>
+
+
+        {{-- 3. UNSCANNED / ABSENT --}}
+        <div class="dashboard-card flex flex-col justify-between">
+            <div class="flex items-start justify-between">
+                <div>
+                    <p class="card-label text-[#eb5757]">Unscanned / Absent</p>
+                    <p id="kpi-absent" class="card-empty text-[#eb5757]">{{ $absent }}</p>
+                </div>
+
+                <div class="w-12 h-12 rounded-xl bg-[#eb5757]/15 text-[#eb5757] border border-[#eb5757]/30 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between mt-4">
+                <span id="kpi-absent-rate" class="text-xs font-semibold text-[#eb5757]">{{ $absentRate }}% absent rate</span>
+                <span class="text-xs text-stone-400">SMS Alerts Queued</span>
+            </div>
+        </div>
+
+
+        {{-- 4. LATE ARRIVALS --}}
+        <div class="dashboard-card flex flex-col justify-between">
+            <div class="flex items-start justify-between">
+                <div>
+                    <p class="card-label text-amber-700">Late Arrivals</p>
+                    <p id="kpi-late" class="card-empty text-amber-700">{{ $late }}</p>
+                </div>
+
+                <div class="w-12 h-12 rounded-xl bg-[#f2c94c]/20 text-amber-800 border border-[#f2c94c]/40 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between mt-4">
+                <span id="kpi-late-rate" class="text-xs font-semibold text-amber-800">{{ $lateRate }}% late rate</span>
+                <span class="text-xs text-stone-400">Gate Scans</span>
+            </div>
+        </div>
+
+    </div>
+
+
+    {{-- =========================================================
+         LIVE ATTENDANCE TABLE & MANUAL OVERRIDE SYSTEM
+    ========================================================== --}}
+    <div class="dashboard-panel">
+
+        <div class="panel-header flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+                <h2 class="panel-title text-[#155d36]">Class Attendance & Presence Roster</h2>
+                <p class="panel-subtitle">Real-time gate synchronization with parent contact details & manual override options</p>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <button
+                    type="button"
+                    onclick="fetchLiveData()"
+                    class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-stone-200 bg-stone-50 hover:bg-stone-100 text-stone-700 text-xs font-semibold transition"
+                >
+                    <svg class="w-3.5 h-3.5 text-stone-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                    </svg>
+                    <span>Sync Now</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="border-b border-stone-100 bg-stone-50/50">
+                        <th class="table-heading">Student Details</th>
+                        <th class="table-heading">Student ID</th>
+                        <th class="table-heading">Time In</th>
+                        <th class="table-heading">Current Presence Status</th>
+                        <th class="table-heading">Parent Contact Info</th>
+                        <th class="table-heading text-right">Manual Override</th>
+                    </tr>
+                </thead>
+
+                <tbody id="student-table-tbody" class="divide-y divide-stone-100">
+                    @forelse($students as $st)
+                        @php
+                            $att = $st->attendance_record;
+                            $pStatus = $st->presence_status;
+                            $tIn = $att && $att->time_in ? \Carbon\Carbon::parse($att->time_in)->format('h:i A') : '—';
+                        @endphp
+
+                        <tr id="student-row-{{ $st->id }}" class="hover:bg-stone-50/60 transition duration-150">
+
+                            {{-- Student Photo & Name --}}
+                            <td class="py-3.5 px-5">
+                                <div class="flex items-center gap-3">
+                                    <img
+                                        src="{{ $st->photo_url }}"
+                                        alt="{{ $st->first_name }}"
+                                        class="w-10 h-10 rounded-full object-cover border border-stone-200 shadow-2xs flex-shrink-0"
+                                    >
+                                    <div>
+                                        <p class="text-sm font-bold text-[#155d36]">
+                                            {{ $st->formatted_name }}
+                                        </p>
+                                        <p class="text-xs text-stone-400">
+                                            Grade {{ $st->grade_level }} - Section {{ $st->section }}
+                                        </p>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="text-right shrink-0">
-                                @if($scan->time_out)
-                                    <span class="text-[10px] font-bold text-sky-700 bg-sky-100 px-2 py-0.5 rounded-md">OUT</span>
-                                    <span class="block text-[10px] font-mono text-slate-500 mt-0.5">
-                                        {{ \Carbon\Carbon::parse($scan->time_out)->format('h:i A') }}
+                            </td>
+
+                            {{-- Student ID --}}
+                            <td class="py-3.5 px-5 text-xs font-mono font-bold text-stone-600">
+                                <span class="px-2 py-1 rounded bg-stone-100 text-stone-700">
+                                    {{ $st->student_no }}
+                                </span>
+                            </td>
+
+                            {{-- Time In --}}
+                            <td class="py-3.5 px-5 text-xs font-medium text-stone-700 whitespace-nowrap student-time-in">
+                                {{ $tIn }}
+                            </td>
+
+                            {{-- Current Status Badge --}}
+                            <td class="py-3.5 px-5 whitespace-nowrap student-status-cell">
+                                @if($pStatus === 'Inside Campus')
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-[#4d88df]/15 text-[#4d88df] border border-[#4d88df]/30">
+                                        <span class="w-2 h-2 rounded-full bg-[#4d88df] animate-pulse"></span>
+                                        Inside Campus
+                                    </span>
+                                @elseif($pStatus === 'Departed')
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-stone-100 text-stone-700 border border-stone-200">
+                                        Departed
+                                    </span>
+                                @elseif($pStatus === 'Present')
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-[#155d36]/10 text-[#155d36] border border-[#155d36]/30">
+                                        Present
+                                    </span>
+                                @elseif($pStatus === 'Late')
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-[#f2c94c]/20 text-amber-800 border border-[#f2c94c]/40">
+                                        Late
+                                    </span>
+                                @elseif($pStatus === 'Excused')
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-purple-50 text-purple-700 border border-purple-200">
+                                        Excused
                                     </span>
                                 @else
-                                    <span class="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-md">IN</span>
-                                    <span class="block text-[10px] font-mono text-slate-500 mt-0.5">
-                                        {{ \Carbon\Carbon::parse($scan->time_in)->format('h:i A') }}
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-[#eb5757]/15 text-[#eb5757] border border-[#eb5757]/30">
+                                        Absent
                                     </span>
                                 @endif
-                            </div>
-                        </div>
+                            </td>
+
+                            {{-- Parent Contact Info --}}
+                            <td class="py-3.5 px-5 text-xs text-stone-600 font-medium">
+                                <div class="flex items-center gap-1.5 text-stone-700">
+                                    <svg class="w-3.5 h-3.5 text-stone-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+                                    </svg>
+                                    <span>{{ $st->parent_contact_info }}</span>
+                                </div>
+                            </td>
+
+                            {{-- Actions (Manual Override) --}}
+                            <td class="py-3.5 px-5 text-right whitespace-nowrap">
+                                <button
+                                    type="button"
+                                    onclick="openOverrideModal({{ json_encode([
+                                        'id' => $st->id,
+                                        'name' => $st->formatted_name,
+                                        'student_no' => $st->student_no,
+                                        'status' => $att?->status ?: 'Absent',
+                                        'remarks' => $att?->remarks ?: ''
+                                    ]) }})"
+                                    class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-stone-200 hover:bg-[#155d36] hover:text-white text-xs font-semibold text-[#155d36] transition duration-150"
+                                >
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                    </svg>
+                                    <span>Update Status</span>
+                                </button>
+                            </td>
+
+                        </tr>
                     @empty
-                        <div class="text-center py-8 text-slate-400 text-xs">
-                            <i class="fa-solid fa-qrcode text-2xl mb-2 text-slate-300"></i>
-                            <p>No gate scans recorded yet for this date.</p>
-                        </div>
+                        <tr>
+                            <td colspan="6" class="py-12 text-center text-stone-400 text-xs font-medium">
+                                No student records found for the selected section or search criteria.
+                            </td>
+                        </tr>
                     @endforelse
-                </div>
-            </div>
-
+                </tbody>
+            </table>
         </div>
 
-    </div>
-
-
-    {{-- ============================================== --}}
-    {{-- MODAL: EXCUSE / UPDATE ATTENDANCE --}}
-    {{-- ============================================== --}}
-    <div 
-        x-show="excuseModal" 
-        style="display: none;"
-        class="fixed inset-0 z-50 overflow-y-auto"
-        role="dialog"
-        aria-modal="true"
-    >
-        {{-- Backdrop --}}
-        <div 
-            x-show="excuseModal"
-            x-transition:enter="ease-out duration-300"
-            x-transition:enter-start="opacity-0"
-            x-transition:enter-end="opacity-100"
-            x-transition:leave="ease-in duration-200"
-            x-transition:leave-start="opacity-100"
-            x-transition:leave-end="opacity-0"
-            class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm"
-            @click="excuseModal = false"
-        ></div>
-
-        <div class="flex min-h-full items-center justify-center p-4 text-center">
-            <div 
-                x-show="excuseModal"
-                x-transition:enter="ease-out duration-300"
-                x-transition:enter-start="opacity-0 scale-95"
-                x-transition:enter-end="opacity-100 scale-100"
-                x-transition:leave="ease-in duration-200"
-                x-transition:leave-start="opacity-100 scale-100"
-                x-transition:leave-end="opacity-0 scale-95"
-                class="relative transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all w-full max-w-md border border-slate-200"
-            >
-                <form method="POST" action="{{ route('teacher.attendance.status') }}">
-                    @csrf
-                    <input type="hidden" name="attendance_date" value="{{ $selectedDate }}">
-                    <input type="hidden" name="student_id" :value="selectedStudent ? selectedStudent.id : ''">
-
-                    {{-- MODAL HEADER --}}
-                    <div class="bg-gradient-to-r from-[#0e2c56] to-[#123b70] p-6 text-white flex items-center justify-between">
-                        <div>
-                            <h3 class="text-base font-bold flex items-center gap-2">
-                                <i class="fa-solid fa-user-pen text-sm"></i>
-                                <span>Excuse / Update Attendance</span>
-                            </h3>
-                            <p class="text-xs text-blue-200 mt-0.5">
-                                Date: {{ \Carbon\Carbon::parse($selectedDate)->format('F d, Y') }}
-                            </p>
-                        </div>
-                        <button type="button" @click="excuseModal = false" class="text-white/70 hover:text-white">
-                            <i class="fa-solid fa-xmark text-lg"></i>
-                        </button>
-                    </div>
-
-                    {{-- MODAL BODY --}}
-                    <div class="p-6 space-y-4">
-                        {{-- Student Summary --}}
-                        <div class="flex items-center gap-3 p-3 bg-slate-50 border border-slate-200 rounded-2xl">
-                            <img :src="selectedStudent ? selectedStudent.photo_url : ''" class="w-12 h-12 rounded-xl object-cover border border-slate-300">
-                            <div>
-                                <h4 class="font-bold text-[#0e2c56] text-sm" x-text="selectedStudent ? (selectedStudent.first_name + ' ' + selectedStudent.last_name) : ''"></h4>
-                                <p class="text-xs font-mono text-slate-400" x-text="selectedStudent ? selectedStudent.student_no : ''"></p>
-                                <p class="text-[11px] text-slate-500" x-text="selectedStudent ? ('Grade ' + selectedStudent.grade_level + ' - ' + (selectedStudent.section || 'General')) : ''"></p>
-                            </div>
-                        </div>
-
-                        {{-- Status Selection --}}
-                        <div>
-                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2">
-                                Attendance Status
-                            </label>
-                            <div class="grid grid-cols-2 gap-2">
-                                <label class="cursor-pointer border rounded-xl p-2.5 flex items-center gap-2 text-xs font-semibold transition" :class="selectedStatus === 'Excused' ? 'border-purple-500 bg-purple-50 text-purple-700' : 'border-slate-200 text-slate-600 hover:bg-slate-50'">
-                                    <input type="radio" name="status" value="Excused" x-model="selectedStatus" class="text-purple-600 focus:ring-0">
-                                    <span>🟣 Excused</span>
-                                </label>
-
-                                <label class="cursor-pointer border rounded-xl p-2.5 flex items-center gap-2 text-xs font-semibold transition" :class="selectedStatus === 'Present' ? 'border-emerald-500 bg-emerald-50 text-emerald-700' : 'border-slate-200 text-slate-600 hover:bg-slate-50'">
-                                    <input type="radio" name="status" value="Present" x-model="selectedStatus" class="text-emerald-600 focus:ring-0">
-                                    <span>🟢 Present</span>
-                                </label>
-
-                                <label class="cursor-pointer border rounded-xl p-2.5 flex items-center gap-2 text-xs font-semibold transition" :class="selectedStatus === 'Late' ? 'border-amber-500 bg-amber-50 text-amber-700' : 'border-slate-200 text-slate-600 hover:bg-slate-50'">
-                                    <input type="radio" name="status" value="Late" x-model="selectedStatus" class="text-amber-600 focus:ring-0">
-                                    <span>🟡 Late</span>
-                                </label>
-
-                                <label class="cursor-pointer border rounded-xl p-2.5 flex items-center gap-2 text-xs font-semibold transition" :class="selectedStatus === 'Absent' ? 'border-rose-500 bg-rose-50 text-rose-700' : 'border-slate-200 text-slate-600 hover:bg-slate-50'">
-                                    <input type="radio" name="status" value="Absent" x-model="selectedStatus" class="text-rose-600 focus:ring-0">
-                                    <span>🔴 Absent</span>
-                                </label>
-                            </div>
-                        </div>
-
-                        {{-- Quick Reason Presets --}}
-                        <div>
-                            <span class="block text-[11px] font-semibold text-slate-500 mb-1.5">Quick Excuse Reasons:</span>
-                            <div class="flex flex-wrap gap-1.5">
-                                <button type="button" @click="setQuickRemark('Medical / Sick Leave with doctor notice')" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-purple-100 hover:text-purple-700 text-[11px] font-medium text-slate-600 transition">
-                                    + Medical / Sick
-                                </button>
-                                <button type="button" @click="setQuickRemark('Family emergency - guardian notified')" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-purple-100 hover:text-purple-700 text-[11px] font-medium text-slate-600 transition">
-                                    + Family Emergency
-                                </button>
-                                <button type="button" @click="setQuickRemark('School academic / sports competition delegate')" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-purple-100 hover:text-purple-700 text-[11px] font-medium text-slate-600 transition">
-                                    + School Delegation
-                                </button>
-                                <button type="button" @click="setQuickRemark('Dental appointment with excuse letter')" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-purple-100 hover:text-purple-700 text-[11px] font-medium text-slate-600 transition">
-                                    + Dental Appt
-                                </button>
-                            </div>
-                        </div>
-
-                        {{-- Reason / Remarks --}}
-                        <div>
-                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
-                                Excuse Reason / Remarks
-                            </label>
-                            <textarea 
-                                name="remarks" 
-                                rows="3" 
-                                x-model="selectedRemarks"
-                                placeholder="State reason for excuse or special note..." 
-                                class="w-full text-xs rounded-xl border-slate-200 focus:ring-2 focus:ring-[#0e2c56]/20 focus:border-[#0e2c56]"
-                            ></textarea>
-                        </div>
-                    </div>
-
-                    {{-- MODAL FOOTER --}}
-                    <div class="p-5 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-2.5 rounded-b-3xl">
-                        <button 
-                            type="button" 
-                            @click="excuseModal = false"
-                            class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-200/70 transition"
-                        >
-                            Cancel
-                        </button>
-                        <button 
-                            type="submit" 
-                            class="px-5 py-2 rounded-xl bg-[#0e2c56] hover:bg-[#123b70] text-white text-xs font-semibold transition shadow-sm flex items-center gap-1.5"
-                        >
-                            <i class="fa-solid fa-check"></i>
-                            <span>Save Status</span>
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
     </div>
 
 </div>
+
+
+{{-- =========================================================
+     MANUAL OVERRIDE MODAL DIALOG
+========================================================== --}}
+<div id="override-modal" class="fixed inset-0 z-50 hidden overflow-y-auto bg-stone-900/40 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl border border-stone-200 shadow-xl max-w-md w-full p-6 space-y-5 transform transition-all">
+
+        <div class="flex items-center justify-between pb-3 border-b border-stone-100">
+            <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-xl bg-[#155d36]/15 text-[#155d36] flex items-center justify-center font-bold">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-base font-bold text-[#155d36]">Manual Attendance Override</h3>
+                    <p class="text-xs text-stone-400">Update attendance status or excuse an absence</p>
+                </div>
+            </div>
+
+            <button type="button" onclick="closeOverrideModal()" class="text-stone-400 hover:text-stone-700 text-lg font-bold">&times;</button>
+        </div>
+
+        <form method="POST" action="{{ route('teacher.attendance.status') }}" class="space-y-4">
+            @csrf
+
+            <input type="hidden" name="student_id" id="modal-student-id">
+            <input type="hidden" name="attendance_date" value="{{ $selectedDate }}">
+
+            <div>
+                <p class="text-[10px] font-bold uppercase tracking-wider text-stone-400">Student</p>
+                <p id="modal-student-name" class="text-sm font-bold text-[#155d36] mt-0.5">—</p>
+                <p id="modal-student-no" class="text-xs font-mono text-stone-500">—</p>
+            </div>
+
+            <div>
+                <label for="modal-status" class="block text-xs font-bold text-stone-700 mb-1">Attendance Status</label>
+                <select
+                    name="status"
+                    id="modal-status"
+                    class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2.5 text-xs font-bold text-[#155d36] focus:outline-none focus:ring-2 focus:ring-[#155d36]/20"
+                    required
+                >
+                    <option value="Present">Present (Mark as Checked In)</option>
+                    <option value="Late">Late Arrival</option>
+                    <option value="Absent">Absent (Triggers Parent SMS Notice)</option>
+                    <option value="Excused">Excused Absence</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="modal-remarks" class="block text-xs font-bold text-stone-700 mb-1">Remarks / Medical Excuse Reason (Optional)</label>
+                <textarea
+                    name="remarks"
+                    id="modal-remarks"
+                    rows="2"
+                    placeholder="e.g. Medical excuse letter submitted / Forgot ID card at home"
+                    class="w-full bg-stone-50 border border-stone-200 rounded-xl p-3 text-xs font-medium text-stone-700 focus:outline-none focus:ring-2 focus:ring-[#155d36]/20"
+                ></textarea>
+            </div>
+
+            <div class="pt-2 flex items-center justify-end gap-3">
+                <button
+                    type="button"
+                    onclick="closeOverrideModal()"
+                    class="px-4 py-2 rounded-xl border border-stone-200 text-stone-600 text-xs font-semibold hover:bg-stone-50 transition"
+                >
+                    Cancel
+                </button>
+                <button
+                    type="submit"
+                    class="px-5 py-2 rounded-xl bg-[#155d36] hover:bg-[#0f4628] text-white text-xs font-bold shadow-xs transition"
+                >
+                    Save Attendance Override
+                </button>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+
+{{-- =========================================================
+     REAL-TIME LIVE SYNCHRONIZATION POLLING SCRIPT
+========================================================== --}}
+<script>
+    function openOverrideModal(data) {
+        document.getElementById('modal-student-id').value = data.id;
+        document.getElementById('modal-student-name').innerText = data.name;
+        document.getElementById('modal-student-no').innerText = 'ID: ' + data.student_no;
+        document.getElementById('modal-status').value = data.status || 'Present';
+        document.getElementById('modal-remarks').value = data.remarks || '';
+        document.getElementById('override-modal').classList.remove('hidden');
+    }
+
+    function closeOverrideModal() {
+        document.getElementById('override-modal').classList.add('hidden');
+    }
+
+    // Auto-polling for real-time gate synchronization (Every 4 seconds)
+    function fetchLiveData() {
+        const section = "{{ $selectedSection }}";
+        const grade = "{{ $selectedGrade }}";
+        const date = "{{ $selectedDate }}";
+        const search = "{{ $search }}";
+
+        const url = `{{ route('teacher.dashboard.live') }}?section=${encodeURIComponent(section)}&grade_level=${encodeURIComponent(grade)}&date=${encodeURIComponent(date)}&search=${encodeURIComponent(search)}`;
+
+        fetch(url, {
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                // Update KPI Metric counts
+                const kpiTotal = document.getElementById('kpi-total');
+                const kpiPresent = document.getElementById('kpi-present');
+                const kpiAbsent = document.getElementById('kpi-absent');
+                const kpiLate = document.getElementById('kpi-late');
+
+                if (kpiTotal) kpiTotal.innerText = data.totalStudents;
+                if (kpiPresent) kpiPresent.innerText = data.presentToday;
+                if (kpiAbsent) kpiAbsent.innerText = data.absentToday;
+                if (kpiLate) kpiLate.innerText = data.lateToday;
+
+                const prRate = document.getElementById('kpi-present-rate');
+                const abRate = document.getElementById('kpi-absent-rate');
+                const ltRate = document.getElementById('kpi-late-rate');
+
+                if (prRate) prRate.innerText = `${data.presenceRate}% attendance rate`;
+                if (abRate) abRate.innerText = `${data.totalStudents > 0 ? Math.round((data.absentToday / data.totalStudents) * 100) : 0}% absent rate`;
+                if (ltRate) ltRate.innerText = `${data.totalStudents > 0 ? Math.round((data.lateToday / data.totalStudents) * 100) : 0}% late rate`;
+
+                // Update Table Rows
+                data.students.forEach(st => {
+                    const row = document.getElementById(`student-row-${st.id}`);
+                    if (row) {
+                        const timeInCell = row.querySelector('.student-time-in');
+                        if (timeInCell) timeInCell.innerText = st.time_in;
+
+                        const statusCell = row.querySelector('.student-status-cell');
+                        if (statusCell) {
+                            let badgeHtml = '';
+                            if (st.presence_status === 'Inside Campus') {
+                                badgeHtml = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-[#4d88df]/15 text-[#4d88df] border border-[#4d88df]/30"><span class="w-2 h-2 rounded-full bg-[#4d88df] animate-pulse"></span>Inside Campus</span>`;
+                            } else if (st.presence_status === 'Departed') {
+                                badgeHtml = `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-stone-100 text-stone-700 border border-stone-200">Departed</span>`;
+                            } else if (st.presence_status === 'Present') {
+                                badgeHtml = `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-[#155d36]/10 text-[#155d36] border border-[#155d36]/30">Present</span>`;
+                            } else if (st.presence_status === 'Late') {
+                                badgeHtml = `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-[#f2c94c]/20 text-amber-800 border border-[#f2c94c]/40">Late</span>`;
+                            } else if (st.presence_status === 'Excused') {
+                                badgeHtml = `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-purple-50 text-purple-700 border border-purple-200">Excused</span>`;
+                            } else {
+                                badgeHtml = `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-[#eb5757]/15 text-[#eb5757] border border-[#eb5757]/30">Absent</span>`;
+                            }
+                            statusCell.innerHTML = badgeHtml;
+                        }
+                    }
+                });
+            }
+        })
+        .catch(err => console.error('Live sync poll error:', err));
+    }
+
+    // Start auto polling every 4 seconds
+    setInterval(fetchLiveData, 4000);
+</script>
 
 @endsection
