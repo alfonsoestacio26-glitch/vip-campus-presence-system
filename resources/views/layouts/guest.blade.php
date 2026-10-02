@@ -96,43 +96,13 @@
                 <!-- Welcome Content -->
                 <div class="relative z-10 max-w-lg px-12 text-center">
 
-                    <!-- Logo -->
-                    <div class="flex justify-center mb-8">
-
-                        <div class="h-28 w-28 rounded-full
-                                    bg-white/10 backdrop-blur-md
-                                    border border-white/20
-                                    flex items-center justify-center
-                                    shadow-2xl">
-
-                            <img
-                                src="{{ asset('images/logo.png') }}"
-                                alt="VIP Logo"
-                                class="h-24 w-24 object-contain"
-                            >
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- Welcome -->
-                    <h2 class="text-4xl font-extrabold tracking-tight">
-                        Welcome Back!
+                    <!-- Hero Headline -->
+                    <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight">
+                        VIP Campus Presence System
                     </h2>
 
-                    <p class="mt-6 text-lg leading-8 text-white/90">
-                        Welcome to the
-                        <span class="font-bold text-white">
-                            VIP Learning Center
-                        </span>
-                        Campus Management System.
-                    </p>
-
-                    <p class="mt-3 text-sm leading-6 text-white/75">
-                        Manage campus presence, attendance,
-                        student information, parent communication,
-                        and reports — all in one place.
+                    <p class="mt-4 text-base leading-relaxed text-white/90">
+                        Automated attendance tracking and real-time SMS notifications for parents and faculty.
                     </p>
 
 
@@ -142,19 +112,19 @@
                         <span class="px-4 py-2 rounded-full
                                      bg-white/15 border border-white/20
                                      text-sm text-white/95 font-medium">
-                            Campus Presence
+                            Attendance Verification
                         </span>
 
                         <span class="px-4 py-2 rounded-full
                                      bg-white/15 border border-white/20
                                      text-sm text-white/95 font-medium">
-                            Attendance
+                            SMS Integration
                         </span>
 
                         <span class="px-4 py-2 rounded-full
                                      bg-white/15 border border-white/20
                                      text-sm text-white/95 font-medium">
-                            Parent Portal
+                            Presence Logs
                         </span>
 
                     </div>
@@ -168,7 +138,7 @@
                         </p>
 
                         <p class="mt-2 text-xs text-white/50">
-                            Automated Campus-Presence Verification System
+                            Automated Attendance & SMS Notification Portal
                         </p>
 
                     </div>

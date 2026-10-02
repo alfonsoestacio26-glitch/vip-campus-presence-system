@@ -9,10 +9,6 @@
         </div>
     @endif
 
-    <h2 class="text-xl font-bold text-center text-[#155d36] mb-6">
-        {{ __('Login to your account') }}
-    </h2>
-
     <form method="POST" action="{{ route('login') }}" class="space-y-4">
         @csrf
 
@@ -73,7 +69,7 @@
         <!-- Login Button -->
         <div class="pt-2">
             <button type="submit" class="w-full py-3 px-4 bg-[#155d36] hover:bg-[#0f4628] text-white font-bold rounded-xl transition duration-200 text-center shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#155d36] text-sm">
-                {{ __('Login') }}
+                {{ __('Sign In') }}
             </button>
         </div>
     </form>
